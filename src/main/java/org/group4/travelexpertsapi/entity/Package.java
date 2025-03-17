@@ -43,6 +43,18 @@ public class Package {
     @Column(name = "pkgagencycommission", precision = 19, scale = 4)
     private BigDecimal pkgagencycommission;
 
+    public Package() {
+    }
+
+    public Package(BigDecimal pkgagencycommission, BigDecimal pkgbaseprice, String pkgdesc, Instant pkgenddate, Instant pkgstartdate, String pkgname) {
+        this.pkgagencycommission = pkgagencycommission;
+        this.pkgbaseprice = pkgbaseprice;
+        this.pkgdesc = pkgdesc;
+        this.pkgenddate = pkgenddate;
+        this.pkgstartdate = pkgstartdate;
+        this.pkgname = pkgname;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -99,4 +111,16 @@ public class Package {
         this.pkgagencycommission = pkgagencycommission;
     }
 
+    @Override
+    public String toString() {
+        return "Package{" +
+                "id=" + id +
+                ", pkgname='" + pkgname + '\'' +
+                ", pkgstartdate=" + pkgstartdate +
+                ", pkgenddate=" + pkgenddate +
+                ", pkgdesc='" + pkgdesc + '\'' +
+                ", pkgbaseprice=" + pkgbaseprice +
+                ", pkgagencycommission=" + pkgagencycommission +
+                '}';
+    }
 }
