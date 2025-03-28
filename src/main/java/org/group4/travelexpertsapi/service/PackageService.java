@@ -22,7 +22,7 @@ public class PackageService {
     }
 
     // Get package by ID
-    public Package getPackageById(Long packageId) {
+    public Package getPackageById(Integer packageId) {
         return packageRepo.findById(packageId).orElse(null);
     }
 
@@ -32,7 +32,7 @@ public class PackageService {
     }
 
     // Update a package
-    public Package updatePackage(Long packageId, Package updatedPackage) {
+    public Package updatePackage(Integer packageId, Package updatedPackage) {
         Package existingPackage = packageRepo.findById(packageId).orElse(null);
         if (existingPackage != null) {
             existingPackage.setPkgname(updatedPackage.getPkgname());
@@ -46,7 +46,7 @@ public class PackageService {
     }
 
     // Delete a package
-    public void deletePackage(Long packageId) {
+    public void deletePackage(Integer packageId) {
         packageRepo.deleteById(packageId);
     }
 }
