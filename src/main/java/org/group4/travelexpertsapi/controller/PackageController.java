@@ -27,7 +27,7 @@ public class PackageController {
 
     // Endpoint to get package by ID
     @GetMapping("/{package_id}")
-    public Package getPackage(@PathVariable Long package_id) {
+    public Package getPackage(@PathVariable Integer package_id) {
         return packageService.getPackageById(package_id);
     }
 
@@ -40,14 +40,14 @@ public class PackageController {
 
     // Endpoint to update a package
     @PutMapping("/{package_id}")
-    public ResponseEntity<Package> updatePackage(@PathVariable Long package_id, @RequestBody Package updatedPackage) {
+    public ResponseEntity<Package> updatePackage(@PathVariable Integer package_id, @RequestBody Package updatedPackage) {
         Package toUpdate = packageService.updatePackage(package_id, updatedPackage);
         return new ResponseEntity<>(toUpdate, HttpStatus.OK);
     }
 
     // Endpoint to delete a package
     @DeleteMapping("/{package_id}")
-    public ResponseEntity<Void> deletePackage(@PathVariable Long package_id) {
+    public ResponseEntity<Void> deletePackage(@PathVariable Integer package_id) {
         packageService.deletePackage(package_id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
