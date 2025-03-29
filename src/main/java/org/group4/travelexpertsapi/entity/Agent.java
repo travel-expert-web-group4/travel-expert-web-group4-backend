@@ -1,5 +1,6 @@
 package org.group4.travelexpertsapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
@@ -8,9 +9,10 @@ import org.hibernate.annotations.ColumnDefault;
 @Table(name = "agents", schema = "public")
 public class Agent {
     @Id
-    @ColumnDefault("nextval('agents_agentid_seq')")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "agentid", nullable = false)
     private Integer id;
+
 
     @Size(max = 20)
     @ColumnDefault("NULL")
@@ -44,7 +46,15 @@ public class Agent {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agencyid")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Agency agencyid;
+
+    @Column(name = "status", nullable = false)
+    private String status;
+
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
+
 
     @Size(max = 20)
     @ColumnDefault("'agent'")
@@ -121,6 +131,22 @@ public class Agent {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 
 }
