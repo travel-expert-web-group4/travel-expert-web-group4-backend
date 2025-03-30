@@ -1,9 +1,6 @@
 package org.group4.travelexpertsapi.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -11,7 +8,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Table(name = "agencies", schema = "public")
 public class Agency {
     @Id
-    @ColumnDefault("nextval('agencies_agencyid_seq')")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "agencyid", nullable = false)
     private Integer id;
 
