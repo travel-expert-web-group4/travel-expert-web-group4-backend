@@ -1,5 +1,6 @@
 package org.group4.travelexpertsapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -62,12 +63,16 @@ public class Customer {
 
     @Size(max = 50)
     @NotNull
-    @Column(name = "custemail", nullable = false, length = 50)
+    @Column(name = "custemail", nullable = false, unique = true, length = 50)
     private String custemail;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agentid")
     private Agent agentid;
+
+    @OneToOne(mappedBy = "customer")
+    @JsonBackReference(value = "user-customer")
+    private WebUser webUser;
 
     public Integer getId() {
         return id;
@@ -165,4 +170,11 @@ public class Customer {
         this.agentid = agentid;
     }
 
+    public WebUser getWebUser() {
+        return webUser;
+    }
+
+    public void setWebUser(WebUser webUser) {
+        this.webUser = webUser;
+    }
 }

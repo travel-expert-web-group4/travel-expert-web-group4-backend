@@ -1,15 +1,15 @@
 package org.group4.travelexpertsapi.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "packages", schema = "public")
@@ -42,6 +42,24 @@ public class Package {
     @ColumnDefault("NULL")
     @Column(name = "pkgagencycommission", precision = 19, scale = 4)
     private BigDecimal pkgagencycommission;
+
+    @Column(columnDefinition = "TEXT")
+    private String imageUrl;
+
+    private String destination;
+
+    @Column(precision = 8, scale = 4)
+    private BigDecimal lat;
+
+    @Column(precision = 8, scale = 4)
+    private BigDecimal lng;
+
+    @Column(precision = 2, scale = 1)
+    private BigDecimal rating;
+
+    @OneToMany(mappedBy = "pkg", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
+    @JsonManagedReference(value = "package-reviews")
+    private List<PackageReview> reviews = new ArrayList<>();
 
     public Package() {
     }
@@ -111,16 +129,52 @@ public class Package {
         this.pkgagencycommission = pkgagencycommission;
     }
 
-    @Override
-    public String toString() {
-        return "Package{" +
-                "id=" + id +
-                ", pkgname='" + pkgname + '\'' +
-                ", pkgstartdate=" + pkgstartdate +
-                ", pkgenddate=" + pkgenddate +
-                ", pkgdesc='" + pkgdesc + '\'' +
-                ", pkgbaseprice=" + pkgbaseprice +
-                ", pkgagencycommission=" + pkgagencycommission +
-                '}';
+    public String getImageUrl() {
+        return imageUrl;
     }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getDestination() {
+        return destination;
+    }
+
+    public void setDestination(String destination) {
+        this.destination = destination;
+    }
+
+    public BigDecimal getLat() {
+        return lat;
+    }
+
+    public void setLat(BigDecimal lat) {
+        this.lat = lat;
+    }
+
+    public BigDecimal getLng() {
+        return lng;
+    }
+
+    public void setLng(BigDecimal lng) {
+        this.lng = lng;
+    }
+
+    public BigDecimal getRating() {
+        return rating;
+    }
+
+    public void setRating(BigDecimal rating) {
+        this.rating = rating;
+    }
+
+    public List<PackageReview> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<PackageReview> reviews) {
+        this.reviews = reviews;
+    }
+
 }

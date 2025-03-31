@@ -1,10 +1,12 @@
 package org.group4.travelexpertsapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "bookings", schema = "public", indexes = {
@@ -30,6 +32,12 @@ public class Booking {
 
     @Column(name = "travelercount")
     private Double travelercount;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+    private Instant savedAt;
+
+    @Column(columnDefinition = "TEXT")
+    private String travelers;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customerid")
@@ -100,4 +108,19 @@ public class Booking {
         this.packageid = packageid;
     }
 
+    public Instant getSavedAt() {
+        return savedAt;
+    }
+
+    public void setSavedAt(Instant savedAt) {
+        this.savedAt = savedAt;
+    }
+
+    public String getTravelers() {
+        return travelers;
+    }
+
+    public void setTravelers(String travelers) {
+        this.travelers = travelers;
+    }
 }
