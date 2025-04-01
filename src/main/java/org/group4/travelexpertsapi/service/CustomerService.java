@@ -17,6 +17,7 @@ public class CustomerService {
 
     private CustomerRepo customerRepo;
     private CustomerTypeRepo customerTypeRepo;
+    private AgentRepository agentRepo;
 
     // Constructor
 
