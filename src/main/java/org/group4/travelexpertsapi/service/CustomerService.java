@@ -7,8 +7,17 @@ import org.group4.travelexpertsapi.entity.CustomerType;
 import org.group4.travelexpertsapi.repository.CustomerRepo;
 import org.group4.travelexpertsapi.repository.CustomerTypeRepo;
 import org.group4.travelexpertsapi.repository.AgentRepository;
-import org.springframework.stereotype.Service;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +27,10 @@ public class CustomerService {
     private CustomerRepo customerRepo;
     private CustomerTypeRepo customerTypeRepo;
     private AgentRepository agentRepo;
+
+
+    @Value("${customer.image.upload-dir}")
+    private String imageUploadDir;
 
     // Constructor
 
@@ -116,6 +129,30 @@ public class CustomerService {
         Double balance = customerRepo.getTotalPrice(customerid);
         return balance;
     }
+
+    // Profile Picture customer
+
+    public void uploadPicture(Integer customerid, MultipartFile image) {
+        Customer customer = customerRepo.findById(customerid).orElse(null);
+        String filePath = customer.getCustfirstname()+"_"+customer.getCustlastname()+".jpg";
+        try {
+            File fileDir = new File(imageUploadDir);
+            if (!fileDir.exists()) {
+                fileDir.mkdir();
+            }
+            String fileName = image.getOriginalFilename();
+            Path imagePath = Paths.get(imageUploadDir, filePath);
+            Files.write(imagePath, image.getBytes());
+            customer.setProfileImageUrl(imagePath.toString());
+            customerRepo.save(customer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Get Profile Picture of Customer
+
+
     
 
 }

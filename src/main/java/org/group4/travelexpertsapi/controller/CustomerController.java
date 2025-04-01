@@ -1,5 +1,6 @@
 package org.group4.travelexpertsapi.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.group4.travelexpertsapi.entity.Customer;
 
 import org.group4.travelexpertsapi.entity.CustomerType;
@@ -8,6 +9,7 @@ import org.group4.travelexpertsapi.service.CustomerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.util.List;
@@ -81,4 +83,19 @@ public class CustomerController {
 
 
     }
+
+    // Add Profile Picture
+
+    @PostMapping(value = "/{customer_id}/upload-image", consumes = "multipart/form-data")
+    public ResponseEntity<Customer> uploadImage(@PathVariable("customer_id") Integer customer_id, @RequestPart("image") MultipartFile image) {
+        customerService.uploadPicture(customer_id, image);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // Get Profile Picture
+
+//    @GetMapping("/{customer_id}/image")
+//    public MultipartFile getImage(@PathVariable("customer_id") Integer customer_id) {
+//        return customerService.getImageFile(customer_id);
+//    }
 }
