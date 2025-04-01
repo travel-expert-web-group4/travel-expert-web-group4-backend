@@ -1,6 +1,7 @@
 package org.group4.travelexpertsapi.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -12,7 +13,7 @@ import org.hibernate.annotations.ColumnDefault;
 })
 public class Customer {
     @Id
-    @ColumnDefault("nextval('customers_customerid_seq')")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customerid", nullable = false)
     private Integer id;
 
@@ -68,11 +69,28 @@ public class Customer {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agentid")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Agent agentid;
 
     @OneToOne(mappedBy = "customer")
     @JsonBackReference(value = "user-customer")
     private WebUser webUser;
+
+    public Customer() {
+    }
+
+    public Customer(String custemail, String custbusphone, String custhomephone, String custcountry, String custpostal, String custprov, String custcity, String custaddress, String custlastname, String custfirstname) {
+        this.custemail = custemail;
+        this.custbusphone = custbusphone;
+        this.custhomephone = custhomephone;
+        this.custcountry = custcountry;
+        this.custpostal = custpostal;
+        this.custprov = custprov;
+        this.custcity = custcity;
+        this.custaddress = custaddress;
+        this.custlastname = custlastname;
+        this.custfirstname = custfirstname;
+    }
 
     public Integer getId() {
         return id;
