@@ -1,18 +1,24 @@
 package org.group4.travelexpertsapi.service;
 
 import org.group4.travelexpertsapi.entity.Customer;
+import org.group4.travelexpertsapi.entity.CustomerType;
 import org.group4.travelexpertsapi.repository.CustomerRepo;
+import org.group4.travelexpertsapi.repository.CustomerTypeRepo;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CustomerService {
 
     private CustomerRepo customerRepo;
+    private CustomerTypeRepo customerTypeRepo;
 
     // Constructor
-    public CustomerService(CustomerRepo customerRepo) {
+
+    public CustomerService(CustomerRepo customerRepo, CustomerTypeRepo customerTypeRepo) {
         this.customerRepo = customerRepo;
+        this.customerTypeRepo = customerTypeRepo;
     }
+
 
     // CRUD
 
@@ -57,6 +63,34 @@ public class CustomerService {
             customerRepo.delete(customerToDelete);
         }
     }
+
+    // Return customer type
+
+    public CustomerType  getCustomerType(Integer customerid) {
+        CustomerType customerType = null;
+        Double balance = getPointsBalance(customerid);
+        if (balance != null) {
+            if (balance >= 5000 &&  balance < 20000) {
+                customerType = customerTypeRepo.findByNameContainsIgnoreCase("bronze");
+            } else if  (balance >= 20000) {
+                customerType = customerTypeRepo.findByNameContainsIgnoreCase("platinum");
+            } else {
+                customerType = customerTypeRepo.findByNameContainsIgnoreCase("guest");
+            }
+        }
+
+
+        return  customerType;
+    }
+
+    // View points
+
+    public Double getPointsBalance(Integer customerid) {
+        Double balance = customerRepo.getTotalPrice(customerid);
+        return balance;
+    }
+
+
 
 
 }
