@@ -1,9 +1,12 @@
 package org.group4.travelexpertsapi.service;
 
-import org.group4.travelexpertsapi.entity.Agent;
+
 import org.group4.travelexpertsapi.entity.Customer;
-import org.group4.travelexpertsapi.repository.AgentRepository;
+import org.group4.travelexpertsapi.entity.Agent;
+import org.group4.travelexpertsapi.entity.CustomerType;
 import org.group4.travelexpertsapi.repository.CustomerRepo;
+import org.group4.travelexpertsapi.repository.CustomerTypeRepo;
+import org.group4.travelexpertsapi.repository.AgentRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,17 +15,25 @@ import java.util.Optional;
 @Service
 public class CustomerService {
 
-    private final CustomerRepo customerRepo;
-    private final AgentRepository agentRepo;
+    private CustomerRepo customerRepo;
+    private CustomerTypeRepo customerTypeRepo;
 
-    public CustomerService(CustomerRepo customerRepo, AgentRepository agentRepo) {
+    // Constructor
+
+    public CustomerService(CustomerRepo customerRepo, CustomerTypeRepo customerTypeRepo, AgentRepository agentRepo) {
         this.customerRepo = customerRepo;
+        this.customerTypeRepo = customerTypeRepo;
         this.agentRepo = agentRepo;
     }
 
+
+    // CRUD
+  
     public List<Customer> getAllCustomers() {
         return customerRepo.findAll();
     }
+
+    // (R) Get customer by id
 
     public Optional<Customer> getCustomerById(Integer id) {
         Customer customer = customerRepo.findById(id).orElse(null);
@@ -31,6 +42,8 @@ public class CustomerService {
         }
         return Optional.empty();
     }
+
+    // (C) Create new customer
 
     public Optional<Customer> addCustomer(Integer agentId, Customer customer) {
         Agent agent = agentRepo.findById(agentId).orElse(null);
@@ -41,6 +54,8 @@ public class CustomerService {
         }
         return Optional.empty();
     }
+
+    // (U) Update customer
 
     public Optional<Customer> updateCustomer(Integer id, Customer updatedCustomer) {
         Customer existingCustomer = customerRepo.findById(id).orElse(null);
@@ -64,6 +79,9 @@ public class CustomerService {
         return Optional.empty();
     }
 
+
+    // (D) Delete customer
+
     public boolean deleteCustomer(Integer id) {
         if (!customerRepo.existsById(id)) {
             return false;
@@ -71,4 +89,32 @@ public class CustomerService {
         customerRepo.deleteById(id);
         return true;
     }
+
+    // Return customer type
+
+    public CustomerType  getCustomerType(Integer customerid) {
+        CustomerType customerType = null;
+        Double balance = getPointsBalance(customerid);
+        if (balance != null) {
+            if (balance >= 5000 &&  balance < 20000) {
+                customerType = customerTypeRepo.findByNameContainsIgnoreCase("bronze");
+            } else if  (balance >= 20000) {
+                customerType = customerTypeRepo.findByNameContainsIgnoreCase("platinum");
+            } else {
+                customerType = customerTypeRepo.findByNameContainsIgnoreCase("guest");
+            }
+        }
+
+
+        return  customerType;
+    }
+
+    // View points
+
+    public Double getPointsBalance(Integer customerid) {
+        Double balance = customerRepo.getTotalPrice(customerid);
+        return balance;
+    }
+    
+
 }

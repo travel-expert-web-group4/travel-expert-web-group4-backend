@@ -67,7 +67,7 @@ public class Customer {
     @Column(name = "custemail", nullable = false, unique = true, length = 50)
     private String custemail;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "agentid")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Agent agentid;
