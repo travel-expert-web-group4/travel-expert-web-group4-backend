@@ -20,7 +20,7 @@ import java.time.Instant;
 })
 public class Bookingdetail {
     @Id
-    @ColumnDefault("nextval('bookingdetails_bookingdetailid_seq')")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bookingdetailid", nullable = false)
     private Integer id;
 

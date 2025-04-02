@@ -15,11 +15,12 @@ public class BookingDTO {
     private BigDecimal basePrice;
     private BigDecimal agencyCommission;
     private Instant savedAt;
+    private String travelers;
 
     public BookingDTO() {
     }
 
-    public BookingDTO(String bookingNo, String name, String destination, Instant tripStart, Instant tripEnd, Double travelerCount, String tripTypeId, BigDecimal basePrice, BigDecimal agencyCommission, Instant savedAt) {
+    public BookingDTO(String bookingNo, String name, String destination, Instant tripStart, Instant tripEnd, Double travelerCount, String tripTypeId, BigDecimal basePrice, BigDecimal agencyCommission, Instant savedAt, String travelers) {
         this.bookingNo = bookingNo;
         this.name = name;
         this.destination = destination;
@@ -30,6 +31,7 @@ public class BookingDTO {
         this.basePrice = basePrice;
         this.agencyCommission = agencyCommission;
         this.savedAt = savedAt;
+        this.travelers = travelers;
     }
 
     public String getBookingNo() {
@@ -110,6 +112,14 @@ public class BookingDTO {
 
     public void setSavedAt(Instant savedAt) {
         this.savedAt = savedAt;
+    }
+
+    public String getTravelers() {
+        return travelers;
+    }
+
+    public void setTravelers(String travelers) {
+        this.travelers = travelers;
     }
 }
 
