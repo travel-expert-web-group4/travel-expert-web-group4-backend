@@ -13,10 +13,22 @@ public class StaticResourceConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        Path uploadDir = Paths.get("uploads/images/agents");
-        String uploadPath = uploadDir.toFile().getAbsolutePath();
+
+        String agentPath = getuploadPath("uploads/images/agents");
+        String customerPath = getuploadPath("uploads/images/customers");
 
         registry.addResourceHandler("/images/agents/**")
-                .addResourceLocations("file:" + uploadPath + "/");
+                .addResourceLocations("file:" + agentPath + "/");
+
+        registry.addResourceHandler("/images/customers/**")
+                .addResourceLocations("file:" + customerPath + "/");
+
+
+    }
+
+    public String getuploadPath(String pathname) {
+        Path uploadDir = Paths.get(pathname);
+        String uploadPath = uploadDir.toFile().getAbsolutePath();
+        return uploadPath;
     }
 }

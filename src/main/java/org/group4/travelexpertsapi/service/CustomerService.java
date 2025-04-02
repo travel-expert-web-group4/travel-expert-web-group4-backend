@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -129,27 +128,75 @@ public class CustomerService {
         return balance;
     }
 
-    // Profile Picture customer
+    // Profile Picture manager
 
-    public void uploadPicture(Integer customerid, MultipartFile image) {
+    public String uploadPicture(Integer customerid, MultipartFile image) {
         Customer customer = customerRepo.findById(customerid).orElse(null);
-        String filePath = customer.getCustfirstname()+"_"+customer.getCustlastname()+".jpg";
+        String filePath = customer.getCustfirstname() + "_" + customer.getCustlastname() + ".jpg";
         try {
             File fileDir = new File(imageUploadDir);
             if (!fileDir.exists()) {
                 fileDir.mkdir();
             }
-            String fileName = image.getOriginalFilename();
+            //String fileName = image.getOriginalFilename();
             Path imagePath = Paths.get(imageUploadDir, filePath);
             Files.write(imagePath, image.getBytes());
-            customer.setProfileImageUrl(imagePath.toString());
-            customerRepo.save(customer);
+
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        String ImageUrl = "/images/customers/" + filePath;
+
+        return ImageUrl;
     }
 
-    // Get Profile Picture of Customer
+        // save Profile Picture
+
+        public void savePicture(Integer customerid, MultipartFile image) {
+            Customer customer = customerRepo.findById(customerid).orElse(null);
+            String ImageUrl = uploadPicture(customerid, image);
+            customer.setProfileImageUrl(ImageUrl);
+            customerRepo.save(customer);
+        }
+
+
+
+
+    // Update Profile Picture of Customer
+    public void updatePicture(Integer customerid, MultipartFile image) {
+        Customer existingCustomer = customerRepo.findById(customerid).orElse(null);
+
+        if (existingCustomer != null) {
+            if (image != null && !image.isEmpty()) {
+                String imagePath = uploadPicture(customerid, image);
+                existingCustomer.setProfileImageUrl(imagePath);
+
+            }
+        }
+
+        customerRepo.save(existingCustomer);
+    }
+
+    // Delete Profile Picture of Customer
+    public void deletePicture(Integer customerid) {
+        Customer customer = customerRepo.findById(customerid).orElse(null);
+        if (customer != null) {
+            String filePath = customer.getCustfirstname() + "_" + customer.getCustlastname() + ".jpg";
+            Path imagePath = Paths.get(imageUploadDir, filePath);
+            try {
+                Files.delete(imagePath);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            customer.setProfileImageUrl(null);
+
+        }
+
+        customerRepo.save(customer);
+    }
 
 
     
