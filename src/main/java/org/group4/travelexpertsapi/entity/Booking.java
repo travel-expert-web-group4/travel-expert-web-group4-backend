@@ -18,11 +18,11 @@ import java.util.List;
 })
 public class Booking {
     @Id
-    @ColumnDefault("nextval('bookings_bookingid_seq')")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bookingid", nullable = false)
     private Integer id;
 
-    @Column(name = "bookingdate")
+    @Column(name = "bookingdate", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant bookingdate;
 
     @Size(max = 50)
