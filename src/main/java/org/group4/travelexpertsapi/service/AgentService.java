@@ -109,5 +109,17 @@ public class AgentService {
         Files.write(filePath, image.getBytes());
         return "/images/agents/" + fileName;
     }
+
+    public Agent updateAgentPhoto(Integer id, MultipartFile image) throws IOException {
+        Agent existing = getAgentById(id);
+        if (existing == null) return null;
+
+        if (image != null && !image.isEmpty()) {
+            String imagePath = saveImage(existing.getAgtemail(), image);
+            existing.setProfileImageUrl(imagePath);
+        }
+
+        return agentRepository.save(existing);
+    }
 }
 

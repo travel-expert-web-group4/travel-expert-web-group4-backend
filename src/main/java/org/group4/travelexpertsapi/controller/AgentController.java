@@ -78,4 +78,22 @@ public class AgentController {
         agentService.deleteAgent(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping(value = "/{id}/update-picture", consumes = {"multipart/form-data"})
+    public ResponseEntity<?> updateAgent(
+            @PathVariable Integer id,
+
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+        try {
+
+            Agent updated = agentService.updateAgentPhoto(id, image);
+            return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "JSON Parsing Error: " + e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid JSON format: " + e.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Unexpected Error: " + e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
+        }
+    }
 }
