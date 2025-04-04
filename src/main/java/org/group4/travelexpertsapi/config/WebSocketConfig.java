@@ -1,4 +1,4 @@
-package org.group4.travelexpertsapi.chat.config;
+package org.group4.travelexpertsapi.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

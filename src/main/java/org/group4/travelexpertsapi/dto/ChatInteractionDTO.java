@@ -1,14 +1,14 @@
-package org.group4.travelexpertsapi.viewmodel;
+package org.group4.travelexpertsapi.dto;
 
 public class ChatInteractionDTO {
-    private Long otherUserId;
+    private String otherUserId;
     private String name;
     private String profilePicture;
     private String lastMessage;
     private boolean isUserTheLastSender;
 
     public ChatInteractionDTO() {}
-    public ChatInteractionDTO(Long otherUserId, String name, String profilePicture, String lastMessage, boolean isUserTheLastSender) {
+    public ChatInteractionDTO(String otherUserId, String name, String profilePicture, String lastMessage, boolean isUserTheLastSender) {
         this.otherUserId = otherUserId;
         this.name = name;
         this.profilePicture = profilePicture;
@@ -16,11 +16,11 @@ public class ChatInteractionDTO {
         this.isUserTheLastSender = isUserTheLastSender;
     }
 
-    public Long getOtherUserId() {
+    public String getOtherUserId() {
         return otherUserId;
     }
 
-    public void setOtherUserId(Long otherUserId) {
+    public void setOtherUserId(String otherUserId) {
         this.otherUserId = otherUserId;
     }
 

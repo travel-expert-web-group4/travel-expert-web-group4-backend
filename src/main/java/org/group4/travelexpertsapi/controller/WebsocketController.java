@@ -1,20 +1,15 @@
-package org.group4.travelexpertsapi.chat.controller;
+package org.group4.travelexpertsapi.controller;
 
-import org.group4.travelexpertsapi.chat.service.ChatService;
+import org.group4.travelexpertsapi.service.ChatService;
 import org.group4.travelexpertsapi.entity.ChatMessage;
-import org.group4.travelexpertsapi.viewmodel.ChatableUserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.List;
 
 @Controller
-public class ChatController {
+public class WebsocketController {
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -33,11 +28,6 @@ public class ChatController {
         );
     }
 
-//    @GetMapping("/contacts")
-//    public List<ChatableUserDTO> getChatContacts(
-//            @RequestParam Long userId,
-//            @RequestParam String role) {
-//        return chatService.getChatContacts(userId, role);
-//    }
+
 }
 

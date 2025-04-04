@@ -1,16 +1,22 @@
-package org.group4.travelexpertsapi.viewmodel;
+package org.group4.travelexpertsapi.dto;
 
 public class ChatableUserDTO {
-    private String userId;
+    private String userEmail;
     private String name;
     private String profilePicture;
 
-    public String getUserId() {
-        return userId;
+    public ChatableUserDTO(String userEmail, String name, String profilePicture) {
+        this.userEmail = userEmail;
+        this.name = name;
+        this.profilePicture = profilePicture;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 
     public String getName() {
