@@ -27,10 +27,10 @@ public class Bookingdetail {
     @Column(name = "itineraryno")
     private Double itineraryno;
 
-    @Column(name = "tripstart")
+    @Column(name = "tripstart", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant tripstart;
 
-    @Column(name = "tripend")
+    @Column(name = "tripend", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant tripend;
 
     @Column(name = "description", length = Integer.MAX_VALUE)

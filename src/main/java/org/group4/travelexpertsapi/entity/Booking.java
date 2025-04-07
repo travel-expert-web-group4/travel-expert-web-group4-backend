@@ -52,6 +52,17 @@ public class Booking {
     @JoinColumn(name = "packageid")
     private org.group4.travelexpertsapi.entity.Package packageid;
 
+    public Booking() {
+    }
+
+    public Booking(String travelers, Instant savedAt, Double travelercount, String bookingno, Instant bookingdate) {
+        this.travelers = travelers;
+        this.savedAt = savedAt;
+        this.travelercount = travelercount;
+        this.bookingno = bookingno;
+        this.bookingdate = bookingdate;
+    }
+
     public Integer getId() {
         return id;
     }
