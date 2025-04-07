@@ -15,7 +15,7 @@ import java.util.List;
 @Table(name = "packages", schema = "public")
 public class Package {
     @Id
-    @ColumnDefault("nextval('packages_packageid_seq')")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "packageid", nullable = false)
     private Integer id;
 
@@ -24,15 +24,15 @@ public class Package {
     @Column(name = "pkgname", nullable = false, length = 50)
     private String pkgname;
 
-    @Column(name = "pkgstartdate")
+    @Column(name = "pkgstartdate", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant pkgstartdate;
 
-    @Column(name = "pkgenddate")
+    @Column(name = "pkgenddate", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant pkgenddate;
 
-    @Size(max = 50)
+    @Size(max = 250)
     @ColumnDefault("NULL")
-    @Column(name = "pkgdesc", length = 50)
+    @Column(name = "pkgdesc", length = 250)
     private String pkgdesc;
 
     @NotNull
