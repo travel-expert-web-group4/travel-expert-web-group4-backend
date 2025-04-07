@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CustomerRepo extends JpaRepository<Customer, Integer> {
   
-    @Query("SELECT sum(bd.baseprice + bd.agencycommission) FROM Booking b JOIN Bookingdetail bd on b.id = bd.bookingid.id WHERE b.customerid.id = :customer_id")
+    @Query("SELECT sum(bd.baseprice) FROM Booking b JOIN Bookingdetail bd on b.id = bd.bookingid.id WHERE b.customerid.id = :customer_id")
     Double getTotalPrice(@Param("customer_id") Integer customer_id);
 
     Customer findByCustemail(String email);
