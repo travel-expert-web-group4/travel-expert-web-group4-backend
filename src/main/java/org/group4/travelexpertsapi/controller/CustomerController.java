@@ -5,6 +5,7 @@ import org.group4.travelexpertsapi.entity.Customer;
 import org.group4.travelexpertsapi.entity.CustomerType;
 
 import org.group4.travelexpertsapi.service.CustomerService;
+import org.group4.travelexpertsapi.service.WebUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,11 +21,13 @@ public class CustomerController {
 
 
     private CustomerService customerService;
+    private WebUserService webUserService;
 
 
 
-    public CustomerController(CustomerService customerService) {
+    public CustomerController(CustomerService customerService, WebUserService webUserService) {
         this.customerService = customerService;
+        this.webUserService = webUserService;
     }
 
 
@@ -71,14 +74,14 @@ public class CustomerController {
     // Get Points
     @GetMapping("/{customer_id}/points")
     public Double getPointsBalance(@PathVariable("customer_id") Integer customer_id) {
-        return customerService.getPointsBalance(customer_id);
+        return webUserService.getPointsBalance(customer_id);
     }
 
     // Get CustomerType
 
     @GetMapping("/{customer_id}/customer-type")
     public CustomerType getCustomerType(@PathVariable("customer_id") Integer customer_id) {
-        return customerService.getCustomerType(customer_id);
+        return webUserService.getCustomerType(customer_id);
 
 
     }
@@ -87,7 +90,7 @@ public class CustomerController {
 
     @PostMapping(value = "/{customer_id}/profile-picture", consumes = "multipart/form-data")
     public ResponseEntity<Customer> uploadImage(@PathVariable("customer_id") Integer customer_id, @RequestPart("image") MultipartFile image) {
-        customerService.savePicture(customer_id, image);
+        webUserService.savePicture(customer_id, image);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -96,14 +99,14 @@ public class CustomerController {
 
     @PutMapping(value = "/{customer_id}/profile-picture", consumes = "multipart/form-data")
     public ResponseEntity<Customer> updateImage(@PathVariable("customer_id") Integer customer_id, @RequestPart("image") MultipartFile image) {
-        customerService.updatePicture(customer_id, image);
+        webUserService.updatePicture(customer_id, image);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // Delete Profile Picture
     @DeleteMapping("/{customer_id}/profile-picture")
     public ResponseEntity<Customer> deleteImage(@PathVariable("customer_id") Integer customer_id) {
-        customerService.deletePicture(customer_id);
+        webUserService.deletePicture(customer_id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

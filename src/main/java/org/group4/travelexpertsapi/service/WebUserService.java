@@ -2,12 +2,21 @@ package org.group4.travelexpertsapi.service;
 
 import org.group4.travelexpertsapi.entity.Agent;
 import org.group4.travelexpertsapi.entity.Customer;
+import org.group4.travelexpertsapi.entity.CustomerType;
 import org.group4.travelexpertsapi.entity.WebUser;
 import org.group4.travelexpertsapi.repository.AgentRepository;
 import org.group4.travelexpertsapi.repository.CustomerRepo;
 import org.group4.travelexpertsapi.repository.CustomerTypeRepo;
 import org.group4.travelexpertsapi.repository.WebUserRepo;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Service
 public class WebUserService {
@@ -23,16 +32,22 @@ public class WebUserService {
         this.agentRepo = agentRepo;
     }
 
+    @Value("${customer.image.upload-dir}")
+    private String imageUploadDir;
+
     // create new web user
     public void createNewUser(String email, String password, String agentEmail){
         WebUser webUser=new WebUser();
         Customer customer = customerRepo.findByCustemail(email);
-        Integer points =  getPointsBalance(customer.getId()).intValue();
+        Double points =  getPointsBalance(customer.getId());
+
+
+
 
         customerTypeSetter(webUser, points);
 
         webUser.setCustomer(customer);
-        webUser.setPoints(points);
+        webUser.setPoints(points.intValue());
 
         // check if agent
 
@@ -50,7 +65,7 @@ public class WebUserService {
         webUserRepo.save(webUser);
     }
 
-    public void customerTypeSetter(WebUser webUser, int points) {
+    public void customerTypeSetter(WebUser webUser, double points) {
 
             if (points >= 5000 &&  points < 20000) {
                 webUser.setCustomerType(customerTypeRepo.findByNameContainsIgnoreCase("bronze"));
@@ -80,5 +95,87 @@ public class WebUserService {
     public WebUser getWebUserById(Integer id) {
         WebUser webUser =  webUserRepo.findById(id).orElse(null);
         return webUser;
+    }
+
+    // Return customer type
+
+    public CustomerType getCustomerType(Integer customerid) {
+        WebUser webUser = webUserRepo.findByCustomer(customerRepo.findById(customerid).orElse(null));
+        CustomerType typeOfWebUser = webUser.getCustomerType();
+        return typeOfWebUser;
+
+    }
+
+    // Profile Picture manager
+
+    public String uploadPicture(Integer customerid, MultipartFile image) {
+        Customer customer = customerRepo.findById(customerid).orElse(null);
+        String filePath = customer.getCustfirstname() + "_" + customer.getCustlastname() + ".jpg";
+        try {
+            File fileDir = new File(imageUploadDir);
+            if (!fileDir.exists()) {
+                fileDir.mkdir();
+            }
+            //String fileName = image.getOriginalFilename();
+            Path imagePath = Paths.get(imageUploadDir, filePath);
+            Files.write(imagePath, image.getBytes());
+
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        String ImageUrl = "/images/customers/" + filePath;
+
+        return ImageUrl;
+    }
+
+    // save Profile Picture
+
+    public void savePicture(Integer customerid, MultipartFile image) {
+        Customer customer = customerRepo.findById(customerid).orElse(null);
+        WebUser webUser = webUserRepo.findByCustomer(customer);
+        String ImageUrl = uploadPicture(customerid, image);
+        webUser.setProfileImage(ImageUrl);
+        webUserRepo.save(webUser);
+    }
+
+
+
+
+    // Update Profile Picture of Customer
+    public void updatePicture(Integer customerid, MultipartFile image) {
+        Customer existingCustomer = customerRepo.findById(customerid).orElse(null);
+        WebUser webUser = webUserRepo.findByCustomer(existingCustomer);
+
+        if (webUser != null) {
+            if (image != null && !image.isEmpty()) {
+                String imagePath = uploadPicture(customerid, image);
+                webUser.setProfileImage(imagePath);
+
+            }
+        }
+
+        webUserRepo.save(webUser);
+    }
+
+    // Delete Profile Picture of Customer
+    public void deletePicture(Integer customerid) {
+        Customer customer = customerRepo.findById(customerid).orElse(null);
+        WebUser webUser = webUserRepo.findByCustomer(customer);
+        if (webUser != null) {
+            String filePath = customer.getCustfirstname() + "_" + customer.getCustlastname() + ".jpg";
+            Path imagePath = Paths.get(imageUploadDir, filePath);
+            try {
+                Files.delete(imagePath);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            webUser.setProfileImage(null);
+
+        }
+
+        webUserRepo.save(webUser);
     }
 }
