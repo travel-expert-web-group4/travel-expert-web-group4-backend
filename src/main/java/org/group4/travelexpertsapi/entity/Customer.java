@@ -76,8 +76,8 @@ public class Customer {
     @JsonBackReference(value = "user-customer")
     private WebUser webUser;
 
-    @Column(name = "profile_image_url")
-    private String profileImageUrl;
+//    @Column(name = "profile_image_url")
+//    private String profileImageUrl;
 
     public Customer() {
     }
@@ -199,11 +199,11 @@ public class Customer {
         this.webUser = webUser;
     }
 
-    public String getProfileImageUrl() {
-        return profileImageUrl;
-    }
-
-    public void setProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
-    }
+//    public String getProfileImageUrl() {
+//        return profileImageUrl;
+//    }
+//
+//    public void setProfileImageUrl(String profileImageUrl) {
+//        this.profileImageUrl = profileImageUrl;
+//    }
 }

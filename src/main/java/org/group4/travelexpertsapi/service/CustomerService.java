@@ -10,13 +10,7 @@ import org.group4.travelexpertsapi.repository.AgentRepository;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +22,8 @@ public class CustomerService {
     private AgentRepository agentRepo;
 
 
-    @Value("${customer.image.upload-dir}")
-    private String imageUploadDir;
+//    @Value("${customer.image.upload-dir}")
+//    private String imageUploadDir;
 
     // Constructor
 
@@ -129,6 +123,10 @@ public class CustomerService {
         return balance;
     }
 
+
+    // THESE METHODS HAVE BEEN UPDATED TO STORE DATA INTO WEB_USER TABLE
+    // THUS THE METHODS HAVE BEEN MOVED TO WEB_USER_SERVICE
+    /*
     // Profile Picture manager
 
     public String uploadPicture(Integer customerid, MultipartFile image) {
@@ -198,6 +196,8 @@ public class CustomerService {
 
         customerRepo.save(customer);
     }
+
+     */
 
 
     
