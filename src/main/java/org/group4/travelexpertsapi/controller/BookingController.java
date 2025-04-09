@@ -43,6 +43,12 @@ public class BookingController {
         return updatedBooking.map(dto -> new ResponseEntity<>(dto, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @PostMapping("/{booking_no}/paid")
+    public ResponseEntity<BookingDTO> setBookingDate(@PathVariable String booking_no) {
+        Optional<BookingDTO> updateBooking = bookingService.setBookingDate(booking_no);
+        return updateBooking.map(bookingDTO -> new ResponseEntity<>(bookingDTO, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
     @DeleteMapping("/{booking_no}")
     public ResponseEntity<Void> deleteBooking(@PathVariable String booking_no) {
         if (bookingService.deleteBooking(booking_no)) {
