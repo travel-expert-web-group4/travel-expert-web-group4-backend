@@ -8,6 +8,9 @@ UPDATE bookings SET travelers = 'Legacy Traveler' WHERE travelers IS NULL;
 
 -- Update existing customers - add emails and fixes
 UPDATE customers SET custemail = 'laetia192@gmail.com' WHERE customerid = 104;
+UPDATE customers SET custemail = 'amoskowitz@home.com' WHERE customerid = 105;
+UPDATE customers SET custemail = 'jolvsade@aol.com' WHERE customerid = 106;
+UPDATE customers SET custemail = 'cmierzwa@msn.com' WHERE customerid = 107;
 UPDATE customers SET custemail = 'wlaporte9@outlook.com' WHERE customerid = 114;
 UPDATE customers SET custemail = 'nancyk2@aol.com' WHERE customerid = 117;
 UPDATE customers SET custemail = 'mabdou11@live.com' WHERE customerid = 119;
@@ -65,10 +68,10 @@ INSERT INTO customer_type (discount_percentage, name) SELECT 0.10, 'Platinum' WH
 INSERT INTO customer_type (discount_percentage, name) SELECT 0, 'Guest' WHERE NOT EXISTS(SELECT 1 FROM customer_type WHERE name = 'Guest');
 
 -- Add some web users - all passwords are 'password' hashed with 10 round bcrypt
-INSERT INTO web_user (is_agent, password, points, customer_id, customer_type_id) SELECT false, '$2a$10$XywW3ff9olJVSk1y3HB9D.pMgt6RF2PDROmgv1BDT7N9UzG79yrKa', 15080, 104, 1 WHERE NOT EXISTS(SELECT 1 FROM web_user WHERE customer_id = 104);
-INSERT INTO web_user (is_agent, password, points, customer_id, customer_type_id) SELECT false, '$2a$10$16tIcmMBB8OfiT/NGBuNOexDb3jEvmOl7OOEAZH2abHt6qJ3lsXxO', 797, 105, 3 WHERE NOT EXISTS(SELECT 1 FROM web_user WHERE customer_id = 105);
-INSERT INTO web_user (is_agent, password, points, customer_id, customer_type_id) SELECT false, '$2a$10$Bnv3uADO/IJhI.dARIPj4eXOR8KZXPVaVBOE9rCPG7RpDkhOjOr5O', 4356, 106, 3 WHERE NOT EXISTS(SELECT 1 FROM web_user WHERE customer_id = 106);
-INSERT INTO web_user (is_agent, password, points, customer_id, customer_type_id) SELECT false, '$2a$10$mfNopq1dDSvmEB8CrkHEaelfdJwG.5ONlAICnFkOcDJEwg8d275sK', 1155, 107, 3 WHERE NOT EXISTS(SELECt 1 FROM web_user WHERE customer_id = 107);
+INSERT INTO web_user (is_agent, password, points, customer_id, customer_type_id, email) SELECT false, '$2a$10$XywW3ff9olJVSk1y3HB9D.pMgt6RF2PDROmgv1BDT7N9UzG79yrKa', 15080, 104, 1, 'laetia192@gmail.com' WHERE NOT EXISTS(SELECT 1 FROM web_user WHERE customer_id = 104);
+INSERT INTO web_user (is_agent, password, points, customer_id, customer_type_id, email) SELECT false, '$2a$10$16tIcmMBB8OfiT/NGBuNOexDb3jEvmOl7OOEAZH2abHt6qJ3lsXxO', 797, 105, 3, 'amoskowitz@home.com'  WHERE NOT EXISTS(SELECT 1 FROM web_user WHERE customer_id = 105);
+INSERT INTO web_user (is_agent, password, points, customer_id, customer_type_id, email) SELECT false, '$2a$10$Bnv3uADO/IJhI.dARIPj4eXOR8KZXPVaVBOE9rCPG7RpDkhOjOr5O', 4356, 106, 3, 'jolvsade@aol.com'  WHERE NOT EXISTS(SELECT 1 FROM web_user WHERE customer_id = 106);
+INSERT INTO web_user (is_agent, password, points, customer_id, customer_type_id, email) SELECT false, '$2a$10$mfNopq1dDSvmEB8CrkHEaelfdJwG.5ONlAICnFkOcDJEwg8d275sK', 1155, 107, 3, 'cmierzwa@msn.com' WHERE NOT EXISTS(SELECt 1 FROM web_user WHERE customer_id = 107);
 
 -- Add some reviews
 INSERT INTO package_review (rating, review, package_id, user_id) SELECT 3, 'Fun but too expensive!', 1, 1 WHERE NOT EXISTS(SELECT 1 FROM package_review WHERE package_id = 1 AND user_id = 1);

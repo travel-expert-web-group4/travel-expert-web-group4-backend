@@ -1,6 +1,7 @@
 package org.group4.travelexpertsapi.controller;
 
 
+import org.group4.travelexpertsapi.entity.Customer;
 import org.group4.travelexpertsapi.entity.WebUser;
 import org.group4.travelexpertsapi.service.WebUserService;
 import org.springframework.http.HttpStatus;
@@ -20,13 +21,13 @@ public class WebUserController {
     // register new user
 
     @PostMapping("/new-user")
-    public ResponseEntity<WebUser> newUser(@RequestPart("email") String email, @RequestPart("password") String password,  @RequestPart(value="agentEmail", required = false) String agentEmail ) {
+    public ResponseEntity<WebUser> newUser(@RequestPart("email") String email, @RequestPart("password") String password,  @RequestPart(value="agentEmail", required = false) String agentEmail , @RequestPart(value="newCustomer", required = false) Customer newCustomer) {
         // NOTE: ONCE SECURITY LAYER IS ADDED, PASSWORD WILL BE HASHED
         /*
         String encodedPassword = new BCryptPasswordEncoder().encode(password);
          */
         String encodedPassword = password;
-        webUserService.createNewUser(email, encodedPassword, agentEmail);
+        webUserService.createNewUser(email, encodedPassword, agentEmail,  newCustomer);
 
 
         return new ResponseEntity<>(HttpStatus.OK);
