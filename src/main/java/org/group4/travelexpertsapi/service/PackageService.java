@@ -37,10 +37,18 @@ public class PackageService {
     }
 
     // Get package by ID
-    public Optional<Package> getPackageById(Integer id) {
-        Package pkg = packageRepo.findById(id).orElse(null);
-        if (pkg != null) {
-            return Optional.of(pkg);
+    public Optional<Package> getPackageById(Integer packageId) {
+        Package existingPackage = packageRepo.findById(packageId).orElse(null);
+        if (existingPackage != null) {
+            // Check if reviews exist, if yes, then update average before returning
+            if (packageReviewRepo.existsByPkg(existingPackage)) {
+                BigDecimal average = packageReviewRepo.getAvgRatingByPkgId(packageId);
+                existingPackage.setRating(average);
+                Package saved = packageRepo.save(existingPackage);
+                return Optional.of(saved);
+            }
+            // If no reviews, return package as-is
+            return Optional.of(existingPackage);
         }
         return Optional.empty();
     }
@@ -51,8 +59,8 @@ public class PackageService {
     }
 
     // Update a package
-    public Optional<Package> updatePackage(Integer id, Package updatedPackage) {
-        Package existingPackage = packageRepo.findById(id).orElse(null);
+    public Optional<Package> updatePackage(Integer packageId, Package updatedPackage) {
+        Package existingPackage = packageRepo.findById(packageId).orElse(null);
         if (existingPackage != null) {
             existingPackage.setPkgname(updatedPackage.getPkgname());
             existingPackage.setPkgstartdate(updatedPackage.getPkgstartdate());
@@ -101,16 +109,6 @@ public class PackageService {
         return Optional.empty();
     }
 
-//    public void updatePackageImage(Integer packageId, MultipartFile image) {
-//        Package existingPackage = packageRepo.findById(packageId).orElse(null);
-//        Optional<String> overwrite = writePackageImage(packageId, image);
-//        if (existingPackage != null && overwrite.isPresent()) {
-//            if (existingPackage.getImageUrl() != null) {
-//
-//            }
-//        }
-//    }
-
     public Optional<Package> deletePackageImage(Integer packageId) {
         Package existingPackage = packageRepo.findById(packageId).orElse(null);
         if (existingPackage != null) {
@@ -128,20 +126,13 @@ public class PackageService {
         return Optional.empty();
     }
 
-    // Set average rating
-    public Optional<Package> setAverageRating(Integer packageId) {
-        Package existingPackage = packageRepo.findById(packageId).orElse(null);
-        if (existingPackage != null && packageReviewRepo.existsByPkg(existingPackage)) {
-            BigDecimal average = packageReviewRepo.getAvgRatingByPkgId(packageId);
-            existingPackage.setRating(average);
-            Package saved = packageRepo.save(existingPackage);
-            return Optional.of(saved);
-        }
-        return Optional.empty();
-    }
-
     // Delete a package
-    public void deletePackage(Integer packageId) {
-        packageRepo.deleteById(packageId);
+    public boolean deletePackage(Integer packageId) {
+        Package packageToDelete = packageRepo.findById(packageId).orElse(null);
+        if (packageToDelete != null) {
+            packageRepo.delete(packageToDelete);
+            return true;
+        }
+        return false;
     }
 }
