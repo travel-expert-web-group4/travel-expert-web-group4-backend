@@ -44,7 +44,7 @@ public class ChatService {
             if (role.equalsIgnoreCase("agent")) {
                 List<Customer> customers = customerRepo.findByAgentid_Id(userId);
                 for (Customer c : customers) {
-                    results.add(new ChatableUserDTO( c.getCustemail(), c.getCustfirstname() + " " + c.getCustlastname(), c.getProfileImageUrl()));
+                    results.add(new ChatableUserDTO( c.getCustemail(), c.getCustfirstname() + " " + c.getCustlastname(), c.getWebUser().getProfileImage()));
 
 
                 }
@@ -84,7 +84,7 @@ public class ChatService {
                 if (customerRepo.existsByCustemail(otherId)) {
                     Customer c = customerRepo.findByCustemail(otherId);
                     name = c.getCustfirstname() + " " + c.getCustemail();
-                    profile = c.getProfileImageUrl();
+                    profile = c.getWebUser().getProfileImage();
                 } else {
                     if (agentRepo.existsByAgtemail(otherId)) {
 
