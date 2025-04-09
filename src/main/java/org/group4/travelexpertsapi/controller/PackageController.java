@@ -28,6 +28,7 @@ public class PackageController {
     }
 
     // Endpoint to get package by ID
+    // Added logic to automatically update the average rating based on reviews
     @GetMapping("/{id}")
     public ResponseEntity<Package> getPackage(@PathVariable Integer id) {
         Optional<Package> existingPackage = packageService.getPackageById(id);
@@ -62,17 +63,13 @@ public class PackageController {
         return existingPackage.map(aPackage -> new ResponseEntity<>(aPackage, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    // Endpoint to refresh average package rating
-    @PutMapping("/{id}/refresh-rating")
-    public ResponseEntity<Package> getReviewAverage(@PathVariable Integer id) {
-        Optional<Package> existingPackage = packageService.setAverageRating(id);
-        return existingPackage.map(aPackage -> new ResponseEntity<>(aPackage, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
-
     // Endpoint to delete a package
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePackage(@PathVariable Integer id) {
-        packageService.deletePackage(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        if (packageService.deletePackage(id)) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
