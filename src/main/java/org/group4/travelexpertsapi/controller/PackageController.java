@@ -5,8 +5,10 @@ import org.group4.travelexpertsapi.service.PackageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/package")
@@ -20,35 +22,57 @@ public class PackageController {
     }
 
     // Endpoint to get all packages
-    @GetMapping("/list")
+    @GetMapping
     public List<Package> getPackageList() {
         return packageService.getAllPackages();
     }
 
     // Endpoint to get package by ID
-    @GetMapping("/{package_id}")
-    public Package getPackage(@PathVariable Integer package_id) {
-        return packageService.getPackageById(package_id);
+    @GetMapping("/{id}")
+    public ResponseEntity<Package> getPackage(@PathVariable Integer id) {
+        Optional<Package> existingPackage = packageService.getPackageById(id);
+        return existingPackage.map(aPackage -> new ResponseEntity<>(aPackage, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     // Endpoint to add a new package
     @PostMapping("/new")
     public ResponseEntity<Package> newPackage(@RequestBody Package newPackage) {
-        packageService.addPackage(newPackage);
-        return new ResponseEntity<>(newPackage, HttpStatus.CREATED);
+        Package pkg = packageService.addPackage(newPackage);
+        return new ResponseEntity<>(pkg, HttpStatus.CREATED);
     }
 
     // Endpoint to update a package
-    @PutMapping("/{package_id}")
-    public ResponseEntity<Package> updatePackage(@PathVariable Integer package_id, @RequestBody Package updatedPackage) {
-        Package toUpdate = packageService.updatePackage(package_id, updatedPackage);
-        return new ResponseEntity<>(toUpdate, HttpStatus.OK);
+    @PutMapping("/{id}")
+    public ResponseEntity<Package> updatePackage(@PathVariable Integer id, @RequestBody Package updatedPackage) {
+        Optional<Package> existingPackage = packageService.updatePackage(id, updatedPackage);
+        return existingPackage.map(aPackage -> new ResponseEntity<>(aPackage, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    // Endpoint to upload/overwrite an image for a package
+    @PostMapping(value = "/{id}/image", consumes = "multipart/form-data")
+    public ResponseEntity<Package> uploadImage(@PathVariable Integer id, @RequestParam("image") MultipartFile image) {
+        Optional<Package> existingPackage = packageService.addPackageImage(id, image);
+        return existingPackage.map(aPackage -> new ResponseEntity<>(aPackage, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    // Endpoint to delete an image for a package
+    @DeleteMapping("/{id}/image")
+    public ResponseEntity<Package> deleteImage(@PathVariable Integer id) {
+        Optional<Package> existingPackage = packageService.deletePackageImage(id);
+        return existingPackage.map(aPackage -> new ResponseEntity<>(aPackage, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    // Endpoint to refresh average package rating
+    @PutMapping("/{id}/refresh-rating")
+    public ResponseEntity<Package> getReviewAverage(@PathVariable Integer id) {
+        Optional<Package> existingPackage = packageService.setAverageRating(id);
+        return existingPackage.map(aPackage -> new ResponseEntity<>(aPackage, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     // Endpoint to delete a package
-    @DeleteMapping("/{package_id}")
-    public ResponseEntity<Void> deletePackage(@PathVariable Integer package_id) {
-        packageService.deletePackage(package_id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePackage(@PathVariable Integer id) {
+        packageService.deletePackage(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

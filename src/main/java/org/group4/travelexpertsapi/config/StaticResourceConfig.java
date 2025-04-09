@@ -16,6 +16,7 @@ public class StaticResourceConfig implements WebMvcConfigurer {
 
         String agentPath = getuploadPath("uploads/images/agents");
         String customerPath = getuploadPath("uploads/images/customers");
+        String packagePath = getuploadPath("uploads/images/packages");
 
         registry.addResourceHandler("/images/agents/**")
                 .addResourceLocations("file:" + agentPath + "/");
@@ -23,7 +24,8 @@ public class StaticResourceConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/images/customers/**")
                 .addResourceLocations("file:" + customerPath + "/");
 
-
+        registry.addResourceHandler("/images/packages/**")
+                .addResourceLocations("file:" + packagePath + "/");
     }
 
     public String getuploadPath(String pathname) {
