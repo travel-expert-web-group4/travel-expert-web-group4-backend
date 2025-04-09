@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WebUserRepo extends JpaRepository<WebUser,Integer> {
     WebUser findByCustomer(Customer customer);
+
+    WebUser findByEmail(String email);
 }

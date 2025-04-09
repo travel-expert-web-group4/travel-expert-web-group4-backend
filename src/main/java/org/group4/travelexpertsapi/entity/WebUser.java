@@ -16,6 +16,9 @@ public class WebUser {
     private Integer id;
 
     @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
     private String password;
 
     @Column(columnDefinition = "TEXT")
@@ -46,10 +49,11 @@ public class WebUser {
     public WebUser() {
     }
 
-    public WebUser(Boolean isAgent, Integer points, String profileImage, String password) {
+    public WebUser(Boolean isAgent, Integer points, String profileImage, String email, String password) {
         this.isAgent = isAgent;
         this.points = points;
         this.profileImage = profileImage;
+        this.email = email;
         this.password = password;
     }
 
@@ -59,6 +63,14 @@ public class WebUser {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {

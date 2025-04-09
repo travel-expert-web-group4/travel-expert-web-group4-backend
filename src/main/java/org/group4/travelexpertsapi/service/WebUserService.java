@@ -36,9 +36,12 @@ public class WebUserService {
     private String imageUploadDir;
 
     // create new web user
-    public void createNewUser(String email, String password, String agentEmail){
+    public void createNewUser(String email, String password, String agentEmail, Customer newCustomer){
         WebUser webUser=new WebUser();
         Customer customer = customerRepo.findByCustemail(email);
+        if (customer == null){
+            customer = customerRepo.save(newCustomer);
+        }
         Double points =  getPointsBalance(customer.getId());
 
 

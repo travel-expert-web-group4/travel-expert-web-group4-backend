@@ -19,16 +19,23 @@ public class PackageReviewController {
     }
 
     @PostMapping("/post")
-    public ResponseEntity<Void> postReview(@RequestBody PackageReview packageReview) {
-        packageReviewService.newPackageReview(packageReview);
+    public ResponseEntity<Void> postReview(@RequestPart PackageReview packageReview,
+                                           @RequestPart("package_id") Integer package_id,
+                                           @RequestPart("user_email") String user_email ) {
+        packageReviewService.newPackageReview(packageReview, package_id, user_email);
         return new  ResponseEntity<>( HttpStatus.OK);
     }
 
-    @GetMapping("/{package_id}")
+    @GetMapping("/package/{package_id}")
     public List<PackageReview> getPackageReviewsByPackageId(@PathVariable("package_id") Integer package_id) {
         List<PackageReview> reviewsOfSelectedPackage = packageReviewService.getPackageReviewByPackage(package_id);
         return reviewsOfSelectedPackage;
 
+    }
+
+    @GetMapping("/{review_id}")
+    public PackageReview getPackageReviewById(@PathVariable("review_id") Integer review_id) {
+        return packageReviewService.getPackageReviewById(review_id);
     }
 
 

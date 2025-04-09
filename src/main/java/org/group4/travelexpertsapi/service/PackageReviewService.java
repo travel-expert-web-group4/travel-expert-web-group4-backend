@@ -2,6 +2,7 @@ package org.group4.travelexpertsapi.service;
 
 import org.group4.travelexpertsapi.entity.Package;
 import org.group4.travelexpertsapi.entity.PackageReview;
+import org.group4.travelexpertsapi.entity.WebUser;
 import org.group4.travelexpertsapi.repository.PackageRepo;
 import org.group4.travelexpertsapi.repository.PackageReviewRepo;
 import org.group4.travelexpertsapi.repository.WebUserRepo;
@@ -32,11 +33,22 @@ public class PackageReviewService {
 
     }
 
-    public void newPackageReview(PackageReview packageReview) {
+    public void newPackageReview(PackageReview packageReview, Integer package_id, String user_email) {
+        WebUser webUser = webUserRepo.findByEmail(user_email);
+        Package reviewedPackage = packageRepo.findById(package_id).orElse(null);
+        packageReview.setUser(webUser);
+        packageReview.setPkg(reviewedPackage);
+
+
         packageReviewRepo.save(packageReview);
-        Package reviewedPackage = packageReview.getPkg();
+
 //        reviewedPackage.getReviews().add(packageReview);
 //        packageRepo.save(reviewedPackage);
+    }
+
+    public PackageReview getPackageReviewById(int Id) {
+        return packageReviewRepo.findById(Id).orElse(null);
+
     }
 
 
