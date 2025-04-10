@@ -1,8 +1,10 @@
 package org.group4.travelexpertsapi.controller;
 
+import com.sendgrid.Response;
 import com.stripe.model.checkout.Session;
 import org.group4.travelexpertsapi.dto.BookingDTO;
 import org.group4.travelexpertsapi.dto.PaymentResponseDTO;
+import org.group4.travelexpertsapi.service.EmailService;
 import org.group4.travelexpertsapi.service.PDFService;
 import org.group4.travelexpertsapi.service.StripeService;
 import org.springframework.http.HttpHeaders;
@@ -17,10 +19,12 @@ public class StripeController {
 
     private final StripeService stripeService;
     private final PDFService pdfService;
+    private final EmailService emailService;
 
-    public StripeController(StripeService stripeService, PDFService pdfService) {
+    public StripeController(StripeService stripeService, PDFService pdfService, EmailService emailService) {
         this.stripeService = stripeService;
         this.pdfService = pdfService;
+        this.emailService = emailService;
     }
 
     @PostMapping("/checkout")
@@ -30,12 +34,13 @@ public class StripeController {
     }
 
     @GetMapping("/payment-success")
-    public ResponseEntity<Void> success(@RequestParam("session_id") String sessionId) {
+    public ResponseEntity<Response> success(@RequestParam("session_id") String sessionId) {
         Session session = stripeService.getSession(sessionId);
         System.out.println(session.getLineItems().getData());
         // Generate PDF with payment information
         byte[] paymentPDF = pdfService.generatePaymentPDF(session);
         // Email the PDF
-        return new ResponseEntity<>(HttpStatus.OK);
+        Response res = emailService.emailInvoice(paymentPDF, session.getCustomerDetails().getEmail());
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 }
