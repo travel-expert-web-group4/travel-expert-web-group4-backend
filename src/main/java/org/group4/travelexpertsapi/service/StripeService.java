@@ -56,7 +56,7 @@ public class StripeService {
         SessionCreateParams sessionParams = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .setSuccessUrl("http://localhost:8080/api/stripe/payment-success?session_id={CHECKOUT_SESSION_ID}")
-                .setCancelUrl("http://localhost:8080/payment-cancel")
+                .setCancelUrl("http://localhost:8080/api/stripe/payment-cancel")
                 .addLineItem(lineItem)
                 .build();
 

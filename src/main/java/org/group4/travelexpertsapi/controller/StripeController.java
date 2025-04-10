@@ -1,15 +1,12 @@
 package org.group4.travelexpertsapi.controller;
 
-import com.sendgrid.Response;
 import com.stripe.model.checkout.Session;
 import org.group4.travelexpertsapi.dto.BookingDTO;
 import org.group4.travelexpertsapi.dto.PaymentResponseDTO;
 import org.group4.travelexpertsapi.service.EmailService;
 import org.group4.travelexpertsapi.service.PDFService;
 import org.group4.travelexpertsapi.service.StripeService;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
@@ -42,6 +39,11 @@ public class StripeController {
         byte[] paymentPDF = pdfService.generatePaymentPDF(session);
         // Email the PDF
         emailService.emailInvoice(paymentPDF, session.getCustomerDetails().getEmail());
+        return new RedirectView("http://localhost:5173/my-bookings");
+    }
+
+    @GetMapping("/payment-cancel")
+    public RedirectView cancel() {
         return new RedirectView("http://localhost:5173/my-bookings");
     }
 }
