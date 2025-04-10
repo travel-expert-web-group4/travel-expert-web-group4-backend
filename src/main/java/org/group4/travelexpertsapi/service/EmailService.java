@@ -20,7 +20,7 @@ public class EmailService {
     @Value("${spring.sendgrid.api-key}")
     private String apiKey;
 
-    public Response emailInvoice(byte[] paymentPDF, String email) {
+    public void emailInvoice(byte[] paymentPDF, String email) {
         Email from = new Email("ryan.angaangan@edu.sait.ca");
         Email to = new Email(email);
 
@@ -42,7 +42,7 @@ public class EmailService {
             request.setMethod(Method.POST);
             request.setEndpoint("mail/send");
             request.setBody(mail.build());
-            return sg.api(request);
+            sg.api(request);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
