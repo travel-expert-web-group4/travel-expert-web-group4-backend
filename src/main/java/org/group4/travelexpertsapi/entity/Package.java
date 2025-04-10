@@ -46,6 +46,8 @@ public class Package {
     @Column(columnDefinition = "TEXT")
     private String imageUrl;
 
+    @NotNull
+    @Column(nullable = false)
     private String destination;
 
     @Column(precision = 8, scale = 4)
