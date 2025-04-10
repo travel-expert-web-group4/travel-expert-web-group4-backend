@@ -6,6 +6,7 @@ import java.time.Instant;
 public class BookingDTO {
 
     private String bookingNo;
+    private Instant bookingDate;
     private String name;
     private String destination;
     private Instant tripStart;
@@ -20,8 +21,9 @@ public class BookingDTO {
     public BookingDTO() {
     }
 
-    public BookingDTO(String bookingNo, String name, String destination, Instant tripStart, Instant tripEnd, Double travelerCount, String tripTypeId, BigDecimal basePrice, BigDecimal agencyCommission, Instant savedAt, String travelers) {
+    public BookingDTO(String bookingNo, Instant bookingDate, String name, String destination, Instant tripStart, Instant tripEnd, Double travelerCount, String tripTypeId, BigDecimal basePrice, BigDecimal agencyCommission, Instant savedAt, String travelers) {
         this.bookingNo = bookingNo;
+        this.bookingDate = bookingDate;
         this.name = name;
         this.destination = destination;
         this.tripStart = tripStart;
@@ -40,6 +42,14 @@ public class BookingDTO {
 
     public void setBookingNo(String bookingNo) {
         this.bookingNo = bookingNo;
+    }
+
+    public Instant getBookingDate() {
+        return bookingDate;
+    }
+
+    public void setBookingDate(Instant bookingDate) {
+        this.bookingDate = bookingDate;
     }
 
     public String getName() {

@@ -109,6 +109,7 @@ public class BookingService {
         Bookingdetail details = bookingdetailRepo.findByBookingid(booking);
         BookingDTO dto = new BookingDTO();
         dto.setBookingNo(booking.getBookingno());
+        dto.setBookingDate(booking.getBookingdate());
         dto.setName(booking.getPackageid().getPkgname());
         dto.setDestination(booking.getPackageid().getDestination());
         dto.setTripStart(details.getTripstart());
@@ -125,6 +126,7 @@ public class BookingService {
     public Booking convertToBooking(BookingDTO dto, Customer customer, Package bookingPackage, Triptype triptype) {
         Booking booking = new Booking();
         booking.setBookingno(dto.getBookingNo());
+        booking.setBookingdate(dto.getBookingDate());
         booking.setTravelercount(dto.getTravelerCount());
         booking.setCustomerid(customer);
         booking.setTriptypeid(triptype);
