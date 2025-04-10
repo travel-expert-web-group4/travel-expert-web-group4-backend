@@ -15,11 +15,13 @@ public class WebUser {
     @Column(nullable = false)
     private Integer id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String password;
+
+    private String role;
 
     @Column(columnDefinition = "TEXT")
     private String profileImage;
@@ -49,12 +51,13 @@ public class WebUser {
     public WebUser() {
     }
 
-    public WebUser(Boolean isAgent, Integer points, String profileImage, String email, String password) {
+    public WebUser(Boolean isAgent, Integer points, String profileImage, String email, String password, String role) {
         this.isAgent = isAgent;
         this.points = points;
         this.profileImage = profileImage;
         this.email = email;
         this.password = password;
+        this.role = role;
     }
 
     public Integer getId() {
@@ -127,5 +130,13 @@ public class WebUser {
 
     public void setReviews(List<PackageReview> reviews) {
         this.reviews = reviews;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

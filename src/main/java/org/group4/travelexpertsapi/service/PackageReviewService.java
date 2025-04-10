@@ -34,7 +34,7 @@ public class PackageReviewService {
     }
 
     public void newPackageReview(PackageReview packageReview, Integer package_id, String user_email) {
-        WebUser webUser = webUserRepo.findByEmail(user_email);
+        WebUser webUser = webUserRepo.findByEmail(user_email).orElse(null);
         Package reviewedPackage = packageRepo.findById(package_id).orElse(null);
         packageReview.setUser(webUser);
         packageReview.setPkg(reviewedPackage);

@@ -9,6 +9,10 @@ import org.group4.travelexpertsapi.repository.CustomerRepo;
 import org.group4.travelexpertsapi.repository.CustomerTypeRepo;
 import org.group4.travelexpertsapi.repository.WebUserRepo;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,9 +21,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 @Service
-public class WebUserService {
+public class WebUserService implements UserDetailsService {
     WebUserRepo webUserRepo;
     CustomerRepo customerRepo;
     CustomerTypeRepo customerTypeRepo;
@@ -187,5 +192,26 @@ public class WebUserService {
         if (customer != null) {
             return true;
         } else  return false;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<WebUser> webUser = webUserRepo.findByEmail(email);
+        if (webUser.isPresent()) {
+            WebUser user = webUser.get();
+            return User.builder()
+                    .username(user.getEmail())
+                    .password(user.getPassword())
+                    .roles(getRoles(user))
+                    .build();
+        }
+
+        return null;
+    }
+
+    private String[] getRoles(WebUser webUser) {
+        if(webUser.getRole() == null)
+            return new String[] {"CUSTOMER"};
+        return webUser.getRole().split(",");
     }
 }
