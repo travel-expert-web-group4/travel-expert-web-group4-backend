@@ -23,4 +23,7 @@ public interface CustomerRepo extends JpaRepository<Customer, Integer> {
     List<Customer> findByAgentid_Id(Integer agentId);
 
     boolean existsByCustemail(@Size(max = 50) @NotNull String custemail);
+
+    Customer findByCustemailContainingIgnoreCase(String userEmail);
+
 }
