@@ -36,12 +36,10 @@ public class WebUserService {
     private String imageUploadDir;
 
     // create new web user
-    public void createNewUser(String email, String password, String agentEmail, Customer newCustomer){
+    public void createNewUser(String email, String password, String agentEmail){
         WebUser webUser=new WebUser();
         Customer customer = customerRepo.findByCustemail(email);
-        if (customer == null){
-            customer = customerRepo.save(newCustomer);
-        }
+
         Double points =  getPointsBalance(customer.getId());
 
 
@@ -180,5 +178,14 @@ public class WebUserService {
         }
 
         webUserRepo.save(webUser);
+    }
+
+    // check if customer already in database
+
+    public Boolean checkIfCustomerExist(String user_email) {
+        Customer customer = customerRepo.findByCustemailContainingIgnoreCase(user_email);
+        if (customer != null) {
+            return true;
+        } else  return false;
     }
 }
