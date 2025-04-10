@@ -2,8 +2,12 @@ package org.group4.travelexpertsapi.service;
 
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
+import com.stripe.model.LineItem;
+import com.stripe.model.LineItemCollection;
 import com.stripe.model.checkout.Session;
+import com.stripe.net.RequestOptions;
 import com.stripe.param.checkout.SessionCreateParams;
+import com.stripe.param.checkout.SessionRetrieveParams;
 import org.group4.travelexpertsapi.dto.BookingDTO;
 import org.group4.travelexpertsapi.dto.PaymentRequestDTO;
 import org.group4.travelexpertsapi.dto.PaymentResponseDTO;
@@ -13,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.RoundingMode;
+import java.util.*;
 
 @Service
 public class StripeService {
@@ -50,7 +55,7 @@ public class StripeService {
 
         SessionCreateParams sessionParams = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("http://localhost:8080/api/stripe/payment-success")
+                .setSuccessUrl("http://localhost:8080/api/stripe/payment-success?session_id={CHECKOUT_SESSION_ID}")
                 .setCancelUrl("http://localhost:8080/payment-cancel")
                 .addLineItem(lineItem)
                 .build();
@@ -70,6 +75,18 @@ public class StripeService {
         response.setSessionUrl(session.getUrl());
 
         return response;
+    }
+
+    public Session getSession(String sessionId) {
+        Stripe.apiKey = secretKey;
+        try {
+            // Expand the session object to include line items since they are not included by default
+            SessionRetrieveParams params = SessionRetrieveParams.builder()
+                    .addExpand("line_items").build();
+            return Session.retrieve(sessionId, params, null);
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private PaymentRequestDTO convertBookingDTO(BookingDTO booking) {
