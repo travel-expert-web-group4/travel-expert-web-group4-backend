@@ -24,17 +24,15 @@ public class WebUserController {
     @PostMapping("/register-user")
     public ResponseEntity<Void> newUser(@RequestPart("email") String email, @RequestPart("password") String password,  @RequestPart(value="agentEmail", required = false) String agentEmail, @RequestPart(value = "agentPassword", required = false) String agentPassword) {
         // NOTE: ONCE SECURITY LAYER IS ADDED, PASSWORD WILL BE HASHED
-        String encodedAgentPassword = null;
+
 
         String encodedPassword = new BCryptPasswordEncoder().encode(password);
-        if (agentEmail != null && agentPassword != null) {
-            encodedAgentPassword = new BCryptPasswordEncoder().encode(agentPassword);
-        }
+
 
 
 //        String encodedPassword = password;
 //        String encodedAgentPassword = agentPassword;
-        webUserService.createNewUser(email, encodedPassword, agentEmail, encodedAgentPassword);
+        webUserService.createNewUser(email, encodedPassword, agentEmail, agentPassword);
 
 
         return new ResponseEntity<>(HttpStatus.OK);

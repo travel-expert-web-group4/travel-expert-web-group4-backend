@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,29 +41,36 @@ public class WebUserService implements UserDetailsService {
     private String imageUploadDir;
 
     // create new web user
-    public void createNewUser(String email, String password, String agentEmail, String encodedAgentPassword) {
+    public void createNewUser(String email, String password, String agentEmail, String agentPassword) {
         WebUser webUser=new WebUser(email, password);
+        webUser.setPoints((0));
         Customer customer = customerRepo.findByCustemail(email);
 
-        Double points =  getPointsBalance(customer.getId());
+        if (customer != null) {
+            webUser.setCustomer(customer);
+            Double points =  getPointsBalance(customer.getId());
+            customerTypeSetter(webUser, points);
+            webUser.setPoints(points.intValue());
+        }
 
-
-
-
-        customerTypeSetter(webUser, points);
-
-        webUser.setCustomer(customer);
-        webUser.setPoints(points.intValue());
         webUser.setRole("CUSTOMER");
 
         // check if agent
-
         webUser.setAgent(false);
-        if (agentEmail != null){
+
+
+        if (agentEmail != null) {
+
 //            Agent agent = agentRepo.findByAgtemail(agentEmail);
             org.group4.travelexpertsapi.entity.User agent = userRepo.findByEmail(agentEmail);
-            if (agent != null && encodedAgentPassword.equals(agent.getPasswordHash())){
-                webUser.setAgent(true);
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+            if (agent != null){
+                Boolean matches = encoder.matches(agentPassword, agent.getPasswordHash());
+                if (matches) {
+                    webUser.setAgent(true);
+                }
+
             }
         }
 
