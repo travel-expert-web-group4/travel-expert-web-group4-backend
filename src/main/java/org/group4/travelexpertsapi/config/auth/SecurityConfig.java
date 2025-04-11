@@ -1,11 +1,10 @@
-package org.group4.travelexpertsapi.config;
+package org.group4.travelexpertsapi.config.auth;
 
-import org.group4.travelexpertsapi.service.WebUserService;
+import org.group4.travelexpertsapi.service.auth.WebUserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,39 +21,41 @@ public class SecurityConfig {
         this.webUserService = webUserService;
     }
 
+    // auth config for spring security
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService());
-        provider.setPasswordEncoder(new BCryptPasswordEncoder());
-        return provider;
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService());
+        daoAuthenticationProvider.setPasswordEncoder(new BCryptPasswordEncoder());
+        return daoAuthenticationProvider;
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {return webUserService;}
+    public UserDetailsService userDetailsService() {
+        return webUserService;
+    }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
+        // grant authorization to users
         httpSecurity.authorizeHttpRequests(
-
-                securityConfigurer ->
-                        securityConfigurer
-                                .requestMatchers("/api/user/check-user", "/api/user/new-user").permitAll()
+                configurer ->
+                        configurer
+                                .requestMatchers(HttpMethod.GET, "/api/user/check-user").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/user/register-user").permitAll()
+                                .anyRequest().authenticated()
         );
 
+        // basic auth
         httpSecurity.httpBasic(Customizer.withDefaults());
 
         // disable csrf
-        httpSecurity.csrf(csrfConfigurer -> csrfConfigurer.disable());
+        httpSecurity.csrf(csrf -> csrf.disable());
 
-
-
+        // build
         return httpSecurity.build();
-    }
 
-    @Bean
-    public AuthenticationManager authenticationManager() {
-        return new ProviderManager(authenticationProvider());
     }
 }

@@ -3,6 +3,7 @@ package org.group4.travelexpertsapi.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import org.group4.travelexpertsapi.entity.auth.WebUser;
 
 import java.math.BigDecimal;
 

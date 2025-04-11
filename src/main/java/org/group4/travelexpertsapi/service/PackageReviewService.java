@@ -2,10 +2,10 @@ package org.group4.travelexpertsapi.service;
 
 import org.group4.travelexpertsapi.entity.Package;
 import org.group4.travelexpertsapi.entity.PackageReview;
-import org.group4.travelexpertsapi.entity.WebUser;
+import org.group4.travelexpertsapi.entity.auth.WebUser;
 import org.group4.travelexpertsapi.repository.PackageRepo;
 import org.group4.travelexpertsapi.repository.PackageReviewRepo;
-import org.group4.travelexpertsapi.repository.WebUserRepo;
+import org.group4.travelexpertsapi.repository.auth.WebUserRepo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

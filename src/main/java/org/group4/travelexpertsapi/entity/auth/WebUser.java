@@ -1,8 +1,11 @@
-package org.group4.travelexpertsapi.entity;
+package org.group4.travelexpertsapi.entity.auth;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import org.group4.travelexpertsapi.entity.Customer;
+import org.group4.travelexpertsapi.entity.CustomerType;
+import org.group4.travelexpertsapi.entity.PackageReview;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
@@ -26,11 +29,11 @@ public class WebUser {
     @Column(columnDefinition = "TEXT")
     private String profileImage;
 
-    @Column(nullable = false)
+    @Column
     @ColumnDefault("0")
     private Integer points;
 
-    @Column(nullable = false)
+    @Column
     @ColumnDefault("false")
     private Boolean isAgent;
 
@@ -51,13 +54,11 @@ public class WebUser {
     public WebUser() {
     }
 
-    public WebUser(Boolean isAgent, Integer points, String profileImage, String email, String password, String role) {
-        this.isAgent = isAgent;
-        this.points = points;
-        this.profileImage = profileImage;
+    public WebUser(String email, String password) {
+
         this.email = email;
         this.password = password;
-        this.role = role;
+
     }
 
     public Integer getId() {

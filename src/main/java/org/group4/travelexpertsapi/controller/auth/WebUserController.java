@@ -1,9 +1,9 @@
-package org.group4.travelexpertsapi.controller;
+package org.group4.travelexpertsapi.controller.auth;
 
 
-import org.group4.travelexpertsapi.entity.Customer;
-import org.group4.travelexpertsapi.entity.WebUser;
-import org.group4.travelexpertsapi.service.WebUserService;
+//import org.group4.travelexpertsapi.entity.Customer;
+import org.group4.travelexpertsapi.entity.auth.WebUser;
+import org.group4.travelexpertsapi.service.auth.WebUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,14 +21,19 @@ public class WebUserController {
 
     // register new user
 
-    @PostMapping("/new-user")
-    public ResponseEntity<WebUser> newUser(@RequestPart("email") String email, @RequestPart("password") String password,  @RequestPart(value="agentEmail", required = false) String agentEmail, @RequestPart(value = "agentPassword", required = false) String agentPassword) {
+    @PostMapping("/register-user")
+    public ResponseEntity<Void> newUser(@RequestPart("email") String email, @RequestPart("password") String password,  @RequestPart(value="agentEmail", required = false) String agentEmail, @RequestPart(value = "agentPassword", required = false) String agentPassword) {
         // NOTE: ONCE SECURITY LAYER IS ADDED, PASSWORD WILL BE HASHED
+        String encodedAgentPassword = null;
 
         String encodedPassword = new BCryptPasswordEncoder().encode(password);
-        String encodedAgentPassword = new BCryptPasswordEncoder().encode(agentPassword);
+        if (agentEmail != null && agentPassword != null) {
+            encodedAgentPassword = new BCryptPasswordEncoder().encode(agentPassword);
+        }
+
 
 //        String encodedPassword = password;
+//        String encodedAgentPassword = agentPassword;
         webUserService.createNewUser(email, encodedPassword, agentEmail, encodedAgentPassword);
 
 
@@ -41,12 +46,12 @@ public class WebUserController {
     }
 
     @GetMapping("/email")
-    public WebUser getEmail(@RequestParam("email") String email) {
+    public WebUser getEmail(@RequestPart("email") String email) {
         return webUserService.getWebUserByEmail(email);
     }
 
     @GetMapping("/check-user")
-    public boolean checkUser(@RequestParam("email") String email) {
+    public boolean checkUser(@RequestPart("email") String email) {
         return webUserService.checkIfCustomerExist(email);
     }
 

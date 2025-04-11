@@ -1,10 +1,10 @@
-package org.group4.travelexpertsapi.service;
+package org.group4.travelexpertsapi.service.auth;
 
-import org.group4.travelexpertsapi.entity.Agent;
 import org.group4.travelexpertsapi.entity.Customer;
 import org.group4.travelexpertsapi.entity.CustomerType;
-import org.group4.travelexpertsapi.entity.WebUser;
+import org.group4.travelexpertsapi.entity.auth.WebUser;
 import org.group4.travelexpertsapi.repository.*;
+import org.group4.travelexpertsapi.repository.auth.WebUserRepo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +22,7 @@ import java.util.Optional;
 
 @Service
 public class WebUserService implements UserDetailsService {
-    private final UserRepo userRepo;
+    private UserRepo userRepo;
     WebUserRepo webUserRepo;
     CustomerRepo customerRepo;
     CustomerTypeRepo customerTypeRepo;
@@ -41,7 +41,7 @@ public class WebUserService implements UserDetailsService {
 
     // create new web user
     public void createNewUser(String email, String password, String agentEmail, String encodedAgentPassword) {
-        WebUser webUser=new WebUser();
+        WebUser webUser=new WebUser(email, password);
         Customer customer = customerRepo.findByCustemail(email);
 
         Double points =  getPointsBalance(customer.getId());
@@ -53,6 +53,7 @@ public class WebUserService implements UserDetailsService {
 
         webUser.setCustomer(customer);
         webUser.setPoints(points.intValue());
+        webUser.setRole("CUSTOMER");
 
         // check if agent
 
@@ -202,16 +203,32 @@ public class WebUserService implements UserDetailsService {
             return User.builder()
                     .username(user.getEmail())
                     .password(user.getPassword())
-                    .roles(getRoles(user))
+                    .roles(user.getRole())
                     .build();
-        }
 
+        }
         return null;
     }
 
-    private String[] getRoles(WebUser webUser) {
-        if(webUser.getRole() == null)
-            return new String[] {"CUSTOMER"};
-        return webUser.getRole().split(",");
-    }
+
+//    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+//        Optional<WebUser> webUser = webUserRepo.findByEmail(email);
+//        if (webUser.isPresent()) {
+//            WebUser user = webUser.get();
+//            return User.builder()
+//                    .username(user.getEmail())
+//                    .password(user.getPassword())
+//                    .roles(getRoles(user))
+//                    .build();
+//        }
+//
+//        return null;
+//    }
+//
+//     method to split roles
+//    private String[] getRoles(WebUser webUser) {
+//        if(webUser.getRole() == null)
+//            return new String[] {"CUSTOMER"};
+//        return webUser.getRole().split(",");
+//    }
 }

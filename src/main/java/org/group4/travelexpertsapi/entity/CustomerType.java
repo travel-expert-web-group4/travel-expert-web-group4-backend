@@ -2,6 +2,7 @@ package org.group4.travelexpertsapi.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import org.group4.travelexpertsapi.entity.auth.WebUser;
 
 import java.math.BigDecimal;
 import java.util.List;
