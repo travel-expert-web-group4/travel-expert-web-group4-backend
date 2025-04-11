@@ -4,10 +4,7 @@ import org.group4.travelexpertsapi.entity.Agent;
 import org.group4.travelexpertsapi.entity.Customer;
 import org.group4.travelexpertsapi.entity.CustomerType;
 import org.group4.travelexpertsapi.entity.WebUser;
-import org.group4.travelexpertsapi.repository.AgentRepository;
-import org.group4.travelexpertsapi.repository.CustomerRepo;
-import org.group4.travelexpertsapi.repository.CustomerTypeRepo;
-import org.group4.travelexpertsapi.repository.WebUserRepo;
+import org.group4.travelexpertsapi.repository.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,23 +22,25 @@ import java.util.Optional;
 
 @Service
 public class WebUserService implements UserDetailsService {
+    private final UserRepo userRepo;
     WebUserRepo webUserRepo;
     CustomerRepo customerRepo;
     CustomerTypeRepo customerTypeRepo;
     AgentRepository agentRepo;
 
-    public WebUserService(WebUserRepo webUserRepo, CustomerRepo customerRepo, CustomerTypeRepo customerTypeRepo, AgentRepository agentRepo) {
+    public WebUserService(WebUserRepo webUserRepo, CustomerRepo customerRepo, CustomerTypeRepo customerTypeRepo, AgentRepository agentRepo, UserRepo userRepo) {
         this.webUserRepo = webUserRepo;
         this.customerRepo = customerRepo;
         this.customerTypeRepo = customerTypeRepo;
         this.agentRepo = agentRepo;
+        this.userRepo = userRepo;
     }
 
     @Value("${customer.image.upload-dir}")
     private String imageUploadDir;
 
     // create new web user
-    public void createNewUser(String email, String password, String agentEmail){
+    public void createNewUser(String email, String password, String agentEmail, String encodedAgentPassword) {
         WebUser webUser=new WebUser();
         Customer customer = customerRepo.findByCustemail(email);
 
@@ -59,8 +58,9 @@ public class WebUserService implements UserDetailsService {
 
         webUser.setAgent(false);
         if (agentEmail != null){
-            Agent agent = agentRepo.findByAgtemail(agentEmail);
-            if (agent != null /* && agent password check??*/){
+//            Agent agent = agentRepo.findByAgtemail(agentEmail);
+            org.group4.travelexpertsapi.entity.User agent = userRepo.findByEmail(agentEmail);
+            if (agent != null && encodedAgentPassword.equals(agent.getPasswordHash())){
                 webUser.setAgent(true);
             }
         }
