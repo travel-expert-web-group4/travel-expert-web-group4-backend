@@ -71,7 +71,7 @@ public class SecurityConfig {
                                         "/api/chat/history/*/*",
                                         "/api/chat/interactions",
                                         "/api/chat/contacts",
-                                        "api/customer/**"
+                                        "/api/customer/**"
                                 ).hasRole("CUSTOMER")
 
                                 // POST
