@@ -1,6 +1,7 @@
 package org.group4.travelexpertsapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.group4.travelexpertsapi.dto.AgentWithPasswordDTO;
 import org.group4.travelexpertsapi.entity.Agent;
 import org.group4.travelexpertsapi.service.AgentService;
 import org.springframework.http.HttpStatus;
@@ -42,8 +43,11 @@ public class AgentController {
             @RequestPart(value = "image", required = false) MultipartFile image) {
         try {
             LOGGER.info("Received Agent JSON: " + agentJson);
-            Agent agent = objectMapper.readValue(agentJson, Agent.class);
-            Agent saved = agentService.createAgent(agent, image);
+
+
+            AgentWithPasswordDTO dto = objectMapper.readValue(agentJson, AgentWithPasswordDTO.class);
+
+            Agent saved = agentService.createAgent(dto, image);
             return new ResponseEntity<>(saved, HttpStatus.CREATED);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "JSON Parsing Error: " + e.getMessage(), e);

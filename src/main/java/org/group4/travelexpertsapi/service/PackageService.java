@@ -81,7 +81,7 @@ public class PackageService {
     public Optional<String> writePackageImage(Integer packageId, MultipartFile image) {
         Package existingPackage = packageRepo.findById(packageId).orElse(null);
         if (existingPackage != null) {
-            String fileName = existingPackage.getPkgname() + ".jpg";
+            String fileName = existingPackage.getId().toString() + ".jpg";
             try {
                 File dir = new File(imageUploadDir);
                 if (!dir.exists()) {
