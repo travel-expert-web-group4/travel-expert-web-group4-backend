@@ -43,8 +43,73 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(
                 configurer ->
                         configurer
+
                                 .requestMatchers(HttpMethod.GET, "/api/user/check-user").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/user/register-user").permitAll()
+                                // requests by type
+
+                                // GET
+
+                                // permitAll
+                                .requestMatchers(HttpMethod.GET,
+                                        "/api/agencies",
+                                        "/api/agencies/**",
+                                        "/api/agents",
+                                        "/api/agents/**",
+                                        "/api/package",
+                                        "/api/package/**",
+                                        "/api/review/package**",
+                                        "/api/review/**",
+                                        "/api/product/**",
+                                        "/api/supplier/**"
+                                ).permitAll()
+
+                                // only Customers
+                                .requestMatchers(HttpMethod.GET,
+                                        "/api/booking/customer/**",
+                                        "/api/booking/**",
+                                        "/api/chat/history/*/*",
+                                        "/api/chat/interactions",
+                                        "/api/chat/contacts",
+                                        "api/customer/**"
+                                ).hasRole("CUSTOMER")
+
+                                // POST
+
+                                // only Customers
+                                .requestMatchers(HttpMethod.POST,
+                                        "/api/booking/new/**",
+                                        "/api/customer/new/**",
+                                        "/api/customer/*/profile-picture",
+                                        "/api/review/post"
+                                ).hasRole("CUSTOMER")
+
+                                // PUT
+
+                                // only Customers
+                                .requestMatchers(HttpMethod.PUT,
+                                        "/api/booking/**",
+                                        "/api/customer/**"
+
+                                ).hasRole("CUSTOMER")
+
+                                // DELETE
+
+                                // only Customers
+                                .requestMatchers(HttpMethod.DELETE,
+                                        "/api/booking/**",
+                                        "/api/customer/**"
+                                ).hasRole("CUSTOMER")
+
+
+
+                                // CHAT ?? TK
+//                                .requestMatchers("/chat.private").hasRole("CUSTOMER")
+
+                                // AGENTS ACCESS API
+//
+
+
                                 .anyRequest().authenticated()
         );
 
