@@ -82,6 +82,18 @@ public class BookingService {
         return Optional.empty();
     }
 
+    public Optional<BookingDTO> setBookingDate(String bookingNo) {
+        Booking booking = bookingRepo.findByBookingno(bookingNo);
+        if (booking != null) {
+            booking.setBookingdate(ZonedDateTime.now(ZoneId.of("America/Edmonton")).toInstant());
+            booking.setSavedAt(ZonedDateTime.now(ZoneId.of("America/Edmonton")).toInstant());
+            Booking saved = bookingRepo.save(booking);
+            BookingDTO transfer = convertToBookingDTO(saved);
+            return Optional.of(transfer);
+        }
+        return Optional.empty();
+    }
+
     public boolean deleteBooking(String bookingNo) {
         Booking existingBooking = bookingRepo.findByBookingno(bookingNo);
         Bookingdetail details = bookingdetailRepo.findByBookingid(existingBooking);
@@ -97,6 +109,7 @@ public class BookingService {
         Bookingdetail details = bookingdetailRepo.findByBookingid(booking);
         BookingDTO dto = new BookingDTO();
         dto.setBookingNo(booking.getBookingno());
+        dto.setBookingDate(booking.getBookingdate());
         dto.setName(booking.getPackageid().getPkgname());
         dto.setDestination(booking.getPackageid().getDestination());
         dto.setTripStart(details.getTripstart());
@@ -112,13 +125,13 @@ public class BookingService {
 
     public Booking convertToBooking(BookingDTO dto, Customer customer, Package bookingPackage, Triptype triptype) {
         Booking booking = new Booking();
-        booking.setBookingdate(ZonedDateTime.now(ZoneId.of("America/Edmonton")).toInstant());
         booking.setBookingno(dto.getBookingNo());
+        booking.setBookingdate(dto.getBookingDate());
         booking.setTravelercount(dto.getTravelerCount());
         booking.setCustomerid(customer);
         booking.setTriptypeid(triptype);
         booking.setPackageid(bookingPackage);
-        booking.setSavedAt(ZonedDateTime.now(ZoneId.of("America/Edmonton")).toInstant());
+        booking.setSavedAt(dto.getSavedAt());
         booking.setTravelers(dto.getTravelers());
         return booking;
     }
