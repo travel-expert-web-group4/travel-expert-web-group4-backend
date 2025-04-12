@@ -34,7 +34,6 @@ public class StripeController {
     @GetMapping("/payment-success")
     public RedirectView success(@RequestParam("session_id") String sessionId) {
         Session session = stripeService.getSession(sessionId);
-        System.out.println(session.getLineItems().getData());
         // Generate PDF with payment information
         byte[] paymentPDF = pdfService.generatePaymentPDF(session);
         // Email the PDF
