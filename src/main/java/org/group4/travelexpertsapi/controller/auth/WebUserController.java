@@ -1,11 +1,16 @@
 package org.group4.travelexpertsapi.controller.auth;
 
 
-//import org.group4.travelexpertsapi.entity.Customer;
+
 import org.group4.travelexpertsapi.entity.auth.WebUser;
+import org.group4.travelexpertsapi.service.auth.JwtService;
 import org.group4.travelexpertsapi.service.auth.WebUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,10 +20,14 @@ import java.io.IOException;
 @RequestMapping("/api/user")
 public class WebUserController {
 
-    private WebUserService webUserService;
+    private final JwtService jwtService;
+    private final WebUserService webUserService;
+    private final AuthenticationManager authenticationManager;
 
-    public WebUserController(WebUserService webUserService) {
+    public WebUserController(WebUserService webUserService, AuthenticationManager authenticationManager, JwtService jwtService) {
         this.webUserService = webUserService;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     // register new user
@@ -60,6 +69,18 @@ public class WebUserController {
     @GetMapping("/check-user")
     public boolean checkUser(@RequestPart("email") String email) {
         return webUserService.checkIfCustomerExist(email);
+    }
+
+    @GetMapping("/login")
+    public String loginUser(@RequestPart("email") String email, @RequestPart("password") String password) throws BadCredentialsException {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, password));
+        if (authentication.isAuthenticated()) {
+            return jwtService.generateToken(webUserService.loadUserByUsername(email));
+        } else {
+            throw new BadCredentialsException("Incorrect email or password. Authentication failed.");
+        }
+
     }
 
 

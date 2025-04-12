@@ -1,24 +1,32 @@
 package org.group4.travelexpertsapi.config.auth;
 
 import org.group4.travelexpertsapi.service.auth.WebUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
 
     private WebUserService webUserService;
 
-    public SecurityConfig(WebUserService webUserService) {
+
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(WebUserService webUserService, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.webUserService = webUserService;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     // auth config for spring security
@@ -46,6 +54,7 @@ public class SecurityConfig {
 
                                 .requestMatchers(HttpMethod.GET, "/api/user/check-user").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/user/register-user").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/user/login").permitAll()
                                 // requests by type
 
                                 // GET
@@ -71,7 +80,9 @@ public class SecurityConfig {
                                         "/api/chat/history/*/*",
                                         "/api/chat/interactions",
                                         "/api/chat/contacts",
-                                        "/api/customer/**"
+                                        "/api/customer/**",
+                                        "/api/payment-success",
+                                        "/api/stripe/payment-cancel"
 
                                 ).hasRole("CUSTOMER")
 
@@ -82,7 +93,8 @@ public class SecurityConfig {
                                         "/api/booking/new/**",
                                         "/api/customer/new/**",
                                         "/api/customer/*/profile-picture",
-                                        "/api/review/post"
+                                        "/api/review/post",
+                                        "/api/stripe/checkout"
                                 ).hasRole("CUSTOMER")
 
                                 // PUT
@@ -104,7 +116,7 @@ public class SecurityConfig {
 
 
 
-                                // CHAT ?? TK
+                                // CHAT ??? TK
 //                                .requestMatchers("/chat.private").hasRole("CUSTOMER")
 
                                 // AGENTS ACCESS API
@@ -113,6 +125,9 @@ public class SecurityConfig {
 
                                 .anyRequest().authenticated()
         );
+
+        // add jwt filter
+        httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         // basic auth
         httpSecurity.httpBasic(Customizer.withDefaults());
@@ -123,5 +138,10 @@ public class SecurityConfig {
         // build
         return httpSecurity.build();
 
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        return new ProviderManager(authenticationProvider());
     }
 }
