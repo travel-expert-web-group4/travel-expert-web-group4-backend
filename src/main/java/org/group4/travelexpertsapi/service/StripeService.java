@@ -82,7 +82,9 @@ public class StripeService {
         try {
             // Expand the session object to include line items since they are not included by default
             SessionRetrieveParams params = SessionRetrieveParams.builder()
-                    .addExpand("line_items").build();
+                    .addExpand("line_items")
+                    .addExpand("payment_intent")
+                    .build();
             return Session.retrieve(sessionId, params, null);
         } catch (StripeException e) {
             throw new RuntimeException(e);

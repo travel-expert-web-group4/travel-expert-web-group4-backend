@@ -24,8 +24,8 @@ public class EmailService {
         Email from = new Email("ryan.angaangan@edu.sait.ca");
         Email to = new Email(email);
 
-        String subject = "Payment Invoice";
-        Content content = new Content("text/plain", "Payment Invoice");
+        String subject = "Travel Experts Payment Invoice";
+        Content content = new Content("text/plain", "Your payment was successful! The invoice is attached below.");
         Mail mail = new Mail(from, subject, to, content);
 
         Attachments attachments = new Attachments();
