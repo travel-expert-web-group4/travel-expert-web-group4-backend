@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api/user")
 public class WebUserController {
@@ -22,8 +24,15 @@ public class WebUserController {
     // register new user
 
     @PostMapping("/register-user")
-    public ResponseEntity<Void> newUser(@RequestPart("email") String email, @RequestPart("password") String password,  @RequestPart(value="agentEmail", required = false) String agentEmail, @RequestPart(value = "agentPassword", required = false) String agentPassword) {
+    public ResponseEntity<Void> newUser(@RequestPart("email") String email,
+                                        @RequestPart("password") String password,
+                                        @RequestPart(value="agentEmail", required = false) String agentEmail,
+                                        @RequestPart(value = "agentPassword", required = false) String agentPassword) throws Exception {
         // NOTE: ONCE SECURITY LAYER IS ADDED, PASSWORD WILL BE HASHED
+
+        if(agentEmail.equals(email)) {
+            throw new IOException("Agents cannot use company email. Please enter a private email");
+        }
 
 
         String encodedPassword = new BCryptPasswordEncoder().encode(password);

@@ -1,5 +1,6 @@
 package org.group4.travelexpertsapi.service.auth;
 
+
 import org.group4.travelexpertsapi.entity.Customer;
 import org.group4.travelexpertsapi.entity.CustomerType;
 import org.group4.travelexpertsapi.entity.auth.WebUser;
@@ -62,7 +63,7 @@ public class WebUserService implements UserDetailsService {
         if (agentEmail != null) {
 
 //            Agent agent = agentRepo.findByAgtemail(agentEmail);
-            org.group4.travelexpertsapi.entity.User agent = userRepo.findByEmail(agentEmail);
+            org.group4.travelexpertsapi.entity.User agent = userRepo.findByEmail(agentEmail).orElse(null);
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
             if (agent != null){
@@ -205,7 +206,12 @@ public class WebUserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+
+
+        Optional< org.group4.travelexpertsapi.entity.User> mobileUser = userRepo.findByEmail(email);
         Optional<WebUser> webUser = webUserRepo.findByEmail(email);
+
+        // if user is in the webUsers (i.e. customers) table
         if (webUser.isPresent()) {
             WebUser user = webUser.get();
             return User.builder()
@@ -214,6 +220,14 @@ public class WebUserService implements UserDetailsService {
                     .roles(user.getRole())
                     .build();
 
+        // if user is in the users(i.e. agents) table
+        } else if(mobileUser.isPresent()) {
+            org.group4.travelexpertsapi.entity.User  user = mobileUser.get();
+            return User.builder()
+                    .username(user.getEmail())
+                    .password(user.getPasswordHash())
+                    .roles(user.getRole().toUpperCase())
+                    .build();
         }
         return null;
     }
