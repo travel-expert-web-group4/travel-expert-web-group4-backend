@@ -5,7 +5,7 @@ import org.group4.travelexpertsapi.entity.Customer;
 import org.group4.travelexpertsapi.entity.CustomerType;
 
 import org.group4.travelexpertsapi.service.CustomerService;
-import org.group4.travelexpertsapi.service.WebUserService;
+import org.group4.travelexpertsapi.service.auth.WebUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

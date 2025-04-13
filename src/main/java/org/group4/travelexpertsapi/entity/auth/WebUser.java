@@ -1,8 +1,11 @@
-package org.group4.travelexpertsapi.entity;
+package org.group4.travelexpertsapi.entity.auth;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import org.group4.travelexpertsapi.entity.Customer;
+import org.group4.travelexpertsapi.entity.CustomerType;
+import org.group4.travelexpertsapi.entity.PackageReview;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
@@ -15,20 +18,22 @@ public class WebUser {
     @Column(nullable = false)
     private Integer id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
+    private String role;
+
     @Column(columnDefinition = "TEXT")
     private String profileImage;
 
-    @Column(nullable = false)
+    @Column
     @ColumnDefault("0")
     private Integer points;
 
-    @Column(nullable = false)
+    @Column
     @ColumnDefault("false")
     private Boolean isAgent;
 
@@ -49,12 +54,11 @@ public class WebUser {
     public WebUser() {
     }
 
-    public WebUser(Boolean isAgent, Integer points, String profileImage, String email, String password) {
-        this.isAgent = isAgent;
-        this.points = points;
-        this.profileImage = profileImage;
+    public WebUser(String email, String password) {
+
         this.email = email;
         this.password = password;
+
     }
 
     public Integer getId() {
@@ -127,5 +131,13 @@ public class WebUser {
 
     public void setReviews(List<PackageReview> reviews) {
         this.reviews = reviews;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

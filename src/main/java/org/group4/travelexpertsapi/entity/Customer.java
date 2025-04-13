@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.group4.travelexpertsapi.entity.auth.WebUser;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
