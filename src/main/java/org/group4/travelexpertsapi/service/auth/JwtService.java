@@ -92,7 +92,14 @@ public class JwtService {
             if (webUser.getCustomer() == null) {
                 throw new RuntimeException("Customer data missing for this user.");
             }
+
+            // ✅ Customer-specific claims
             claims.put("id", webUser.getCustomer().getId());
+            claims.put("points", webUser.getPoints());
+
+            if (webUser.getCustomerType() != null) {
+                claims.put("customerType", webUser.getCustomerType().getName());
+            }
 
         } else if ("AGENT".equalsIgnoreCase(webUser.getRole())) {
             claims.put("id", webUser.getId());
