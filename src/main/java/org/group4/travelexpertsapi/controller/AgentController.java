@@ -37,6 +37,12 @@ public class AgentController {
         return agent != null ? ResponseEntity.ok(agent) : ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/email")
+    public ResponseEntity<Agent> getAgentByEmail(@RequestPart("email") String email) {
+        Agent agent = agentService.getAgentByEmail(email);
+        return agent != null ? ResponseEntity.ok(agent) : ResponseEntity.notFound().build();
+    }
+
     @PostMapping(value = "", consumes = {"multipart/form-data"})
     public ResponseEntity<?> createAgent(
             @RequestPart("agent") String agentJson,

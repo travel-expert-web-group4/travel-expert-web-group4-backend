@@ -49,6 +49,10 @@ public class CustomerService {
         }
         return Optional.empty();
     }
+    //This method allows user get a list of contacts they are allowed to chat
+    public List<Customer> getCustomersAssignedToAgent(int agentId) {
+        return customerRepo.findByAgentid_Id(agentId);
+    }
 
     // (C) Create new customer
 
