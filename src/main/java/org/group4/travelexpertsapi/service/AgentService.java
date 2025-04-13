@@ -45,6 +45,10 @@ public class AgentService {
         return agentRepository.findById(id).orElse(null);
     }
 
+    public Agent getAgentByEmail(String email) {
+        return agentRepository.findByAgtemail(email);
+    }
+
 
     public Agent createAgent(AgentWithPasswordDTO dto, MultipartFile image) throws IOException {
         Agent agent = dto.getAgent();

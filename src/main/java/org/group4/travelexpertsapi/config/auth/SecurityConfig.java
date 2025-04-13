@@ -53,7 +53,7 @@ public class SecurityConfig {
                         configurer
 
                                 .requestMatchers(HttpMethod.GET, "/api/user/check-user").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/user/register-user").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/user/register-user","/api/agents/").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/user/login").permitAll()
                                 // requests by type
 
@@ -73,7 +73,7 @@ public class SecurityConfig {
                                         "/api/supplier/**"
                                 ).permitAll()
 
-                                // only Customers
+                                // both Customers and agents
                                 .requestMatchers(HttpMethod.GET,
                                         "/api/booking/customer/**",
                                         "/api/booking/**",
@@ -84,7 +84,14 @@ public class SecurityConfig {
                                         "/api/payment-success",
                                         "/api/stripe/payment-cancel"
 
-                                ).hasRole("CUSTOMER")
+                                ).hasAnyRole("CUSTOMER", "AGENT")
+
+                                // only Customers
+                                .requestMatchers(HttpMethod.GET,
+                                        "/api/payment-success",
+                                        "/api/stripe/payment-cancel"
+
+                                ).hasAnyRole("CUSTOMER", "AGENT")
 
                                 // POST
 
@@ -104,7 +111,7 @@ public class SecurityConfig {
                                         "/api/booking/**",
                                         "/api/customer/**"
 
-                                ).hasRole("CUSTOMER")
+                                ).hasAnyRole("CUSTOMER", "AGENT")
 
                                 // DELETE
 
@@ -118,6 +125,22 @@ public class SecurityConfig {
 
                                 // CHAT ??? TK
 //                                .requestMatchers("/chat.private").hasRole("CUSTOMER")
+
+
+
+
+                                // PUT
+
+                                // only Customers
+                                .requestMatchers(HttpMethod.PUT,
+                                        "/api/agents/**",
+                                        "/api/package/**",
+                                        "/api/product/**",
+                                        "/api/supplier/**"
+
+
+                                ).hasRole("AGENT")
+
 
                                 // AGENTS ACCESS API
 //
