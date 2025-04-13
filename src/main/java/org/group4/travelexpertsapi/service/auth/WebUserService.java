@@ -81,36 +81,56 @@ public class WebUserService implements UserDetailsService {
 //        webUserRepo.save(webUser);
 //    }
 
-public void createNewUser(String email, String password, String agentEmail, String agentPassword) {
-    // Encode the password (even though you passed it already encoded, this ensures it's always encoded here)
-//    String encodedPassword = new BCryptPasswordEncoder().encode(password);
-//No need double hashing.
-
+public void createNewUser(String email, String password, String agentEmail, String agentPassword, String role) {
     WebUser webUser = new WebUser(email, password);
-    webUser.setPoints(0);
-    webUser.setRole("CUSTOMER");
-    webUser.setAgent(false); // We are skipping agent logic for now
+    webUser.setPoints(0); // initialize default points
 
-    // Look up customer by email
-    Customer customer = customerRepo.findByCustemail(email);
-    if (customer != null) {
-        // ✅ Prevent duplicate WebUser creation
-        WebUser existing = webUserRepo.findByCustomer(customer);
-        if (existing != null) {
+    if ("CUSTOMER".equalsIgnoreCase(role)) {
+        Customer customer = customerRepo.findByCustemail(email);
+        if (customer == null) {
+            throw new RuntimeException("Customer not found for email: " + email);
+        }
+
+        if (webUserRepo.findByCustomer(customer) != null) {
             throw new RuntimeException("This customer is already registered.");
         }
 
         webUser.setCustomer(customer);
+        webUser.setRole("CUSTOMER");
+        webUser.setAgent(false);
 
-        // Assign points and customer type
         Double points = getPointsBalance(customer.getId());
+        if (points == null) points = 0.0;
         customerTypeSetter(webUser, points);
         webUser.setPoints(points.intValue());
+
+    } else if ("AGENT".equalsIgnoreCase(role)) {
+        if (agentEmail == null || agentPassword == null) {
+            throw new RuntimeException("Agent email and password are required.");
+        }
+
+        org.group4.travelexpertsapi.entity.User agent = userRepo.findByEmail(agentEmail).orElse(null);
+
+        if (agent == null) {
+            throw new RuntimeException("Agent not found.");
+        }
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        boolean matches = encoder.matches(agentPassword, agent.getPasswordHash());
+
+        if (!matches) {
+            throw new RuntimeException("Agent password is incorrect.");
+        }
+
+        // ✅ Agent confirmed — create as AGENT user
+        webUser.setRole("AGENT");
+        webUser.setAgent(true);
+
+        // Optional: You could link to agent object if you want, or track it differently.
     } else {
-        throw new RuntimeException("Customer not found for email: " + email);
+        throw new RuntimeException("Invalid role provided. Must be CUSTOMER or AGENT.");
     }
 
-    // ✅ Save only if it's a new user
     webUserRepo.save(webUser);
 }
 
@@ -136,9 +156,12 @@ public void createNewUser(String email, String password, String agentEmail, Stri
 
     // find web-user by email
     public WebUser getWebUserByEmail(String email) {
-        Customer customer = customerRepo.findByCustemail(email);
-        WebUser webUser = webUserRepo.findByCustomer(customer);
-        return webUser;
+//        Customer customer = customerRepo.findByCustemail(email);
+//        WebUser webUser = webUserRepo.findByCustomer(customer);
+//        return webUser;
+        Optional<WebUser> webUser = webUserRepo.findByEmail(email);
+        return webUser.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+
     }
 
     public WebUser getByEmail(String email) {

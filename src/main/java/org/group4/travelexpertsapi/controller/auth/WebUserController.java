@@ -63,29 +63,27 @@ public class WebUserController {
 public ResponseEntity<?> newUser(
         @RequestParam("email") String email,
         @RequestParam("password") String password,
+        @RequestParam("role") String role, // 👈 new
         @RequestParam(value = "agentEmail", required = false) String agentEmail,
         @RequestParam(value = "agentPassword", required = false) String agentPassword) {
 
-    // Optional: Prevent agents from using company email for registration
-    if (agentEmail != null && agentEmail.equals(email)) {
+    if ("agent".equalsIgnoreCase(role) && agentEmail != null && agentEmail.equals(email)) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Agents cannot use their company email to register as customers.");
+                .body("Agents cannot use their company email as their login email.");
     }
 
     try {
-        // Hash the password before storing it
         String encodedPassword = new BCryptPasswordEncoder().encode(password);
 
-        // Call service to register the user
-        webUserService.createNewUser(email, encodedPassword, agentEmail, agentPassword);
+        webUserService.createNewUser(email, encodedPassword, agentEmail, agentPassword, role); // 👈 updated
 
         return ResponseEntity.status(HttpStatus.CREATED).build(); // 201 Created
     } catch (RuntimeException ex) {
-        // Most likely due to duplicate customer_id
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ex.getMessage()); // 409 Conflict with error message
+                .body(ex.getMessage()); // 409 Conflict
     }
 }
+
 
 
     @GetMapping("/{user_id}")
