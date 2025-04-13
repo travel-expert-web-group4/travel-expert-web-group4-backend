@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -88,11 +89,29 @@ public class CustomerController {
 
     // Add Profile Picture
 
+//    @PostMapping(value = "/{customer_id}/profile-picture", consumes = "multipart/form-data")
+//    public ResponseEntity<Customer> uploadImage(@PathVariable("customer_id") Integer customer_id, @RequestPart("image") MultipartFile image) {
+//        webUserService.savePicture(customer_id, image);
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
+
     @PostMapping(value = "/{customer_id}/profile-picture", consumes = "multipart/form-data")
-    public ResponseEntity<Customer> uploadImage(@PathVariable("customer_id") Integer customer_id, @RequestPart("image") MultipartFile image) {
-        webUserService.savePicture(customer_id, image);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<Map<String, String>> uploadImage(
+            @PathVariable("customer_id") Integer customer_id,
+            @RequestPart("image") MultipartFile image) {
+        try {
+            String savedPath = webUserService.savePicture(customer_id, image); // <- this method should return the saved image path or URL
+
+            // ✅ Return JSON with the image path
+            return ResponseEntity.ok(Map.of("profileImage", savedPath));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to upload image"));
+        }
     }
+
+
 
     // Update Profile Picture
 

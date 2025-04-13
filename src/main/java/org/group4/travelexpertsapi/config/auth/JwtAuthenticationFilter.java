@@ -42,7 +42,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // token has passed null check
 
-        String authToken = authHeader.substring(7);
+//        String authToken = authHeader.substring(7);
+        String authToken = authHeader.substring(7).trim();
 
         //extract username from token
 
@@ -50,27 +51,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 //        System.out.println("username: " + username);
 
+//        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+//            // extract user details from username
+//            UserDetails userDetails = webUserService.loadUserByUsername(username);
+//
+//            // check if token is not expired
+//
+//            if (jwtService.checkIfTokenExpired(authToken)) {
+//                // perform basic authentication using username and password
+//                UsernamePasswordAuthenticationToken authenticationToken =
+//                        new UsernamePasswordAuthenticationToken(
+//                                username,
+//                                userDetails.getPassword(),
+//                                userDetails.getAuthorities());
+//                // add authenticationToken to the request
+//                authenticationToken.setDetails(new WebAuthenticationDetailsSource()
+//                        .buildDetails(request));
+//                // put authenticationToken in the security context
+//                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+//            }
+//
+//        }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // extract user details from username
             UserDetails userDetails = webUserService.loadUserByUsername(username);
 
-            // check if token is not expired
-
             if (jwtService.checkIfTokenExpired(authToken)) {
-                // perform basic authentication using username and password
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(
                                 username,
                                 userDetails.getPassword(),
                                 userDetails.getAuthorities());
-                // add authenticationToken to the request
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource()
                         .buildDetails(request));
-                // put authenticationToken in the security context
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
-
         }
+
 
         filterChain.doFilter(request, response);
 

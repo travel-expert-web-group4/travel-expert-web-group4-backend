@@ -32,29 +32,61 @@ public class WebUserController {
 
     // register new user
 
-    @PostMapping("/register-user")
-    public ResponseEntity<Void> newUser(@RequestPart("email") String email,
-                                        @RequestPart("password") String password,
-                                        @RequestPart(value="agentEmail", required = false) String agentEmail,
-                                        @RequestPart(value = "agentPassword", required = false) String agentPassword) throws Exception {
-        // NOTE: ONCE SECURITY LAYER IS ADDED, PASSWORD WILL BE HASHED
+//    @PostMapping("/register-user")
+//    public ResponseEntity<Void> newUser(@RequestPart("email") String email,
+//                                        @RequestPart("password") String password,
+//                                        @RequestPart(value="agentEmail", required = false) String agentEmail,
+//                                        @RequestPart(value = "agentPassword", required = false) String agentPassword) throws Exception {
+//        // NOTE: ONCE SECURITY LAYER IS ADDED, PASSWORD WILL BE HASHED
+//
+////        if(agentEmail.equals(email)) {
+////            throw new IOException("Agents cannot use company email. Please enter a private email");
+////        }
+//        if (agentEmail != null && agentEmail.equals(email)) {
+//            throw new IOException("Agents cannot use company email. Please enter a private email");
+//        }
+//
+//
+//        String encodedPassword = new BCryptPasswordEncoder().encode(password);
+//
+//
+//
+////        String encodedPassword = password;
+////        String encodedAgentPassword = agentPassword;
+//        webUserService.createNewUser(email, encodedPassword, agentEmail, agentPassword);
+//
+//
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 
-        if(agentEmail.equals(email)) {
-            throw new IOException("Agents cannot use company email. Please enter a private email");
-        }
+@PostMapping("/register-user")
+public ResponseEntity<?> newUser(
+        @RequestParam("email") String email,
+        @RequestParam("password") String password,
+        @RequestParam(value = "agentEmail", required = false) String agentEmail,
+        @RequestParam(value = "agentPassword", required = false) String agentPassword) {
 
+    // Optional: Prevent agents from using company email for registration
+    if (agentEmail != null && agentEmail.equals(email)) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Agents cannot use their company email to register as customers.");
+    }
 
+    try {
+        // Hash the password before storing it
         String encodedPassword = new BCryptPasswordEncoder().encode(password);
 
-
-
-//        String encodedPassword = password;
-//        String encodedAgentPassword = agentPassword;
+        // Call service to register the user
         webUserService.createNewUser(email, encodedPassword, agentEmail, agentPassword);
 
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.CREATED).build(); // 201 Created
+    } catch (RuntimeException ex) {
+        // Most likely due to duplicate customer_id
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ex.getMessage()); // 409 Conflict with error message
     }
+}
+
 
     @GetMapping("/{user_id}")
     public WebUser getUserById(@PathVariable Integer user_id) {
@@ -71,17 +103,41 @@ public class WebUserController {
         return webUserService.checkIfCustomerExist(email);
     }
 
-    @GetMapping("/login")
-    public String loginUser(@RequestPart("email") String email, @RequestPart("password") String password) throws BadCredentialsException {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password));
-        if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(webUserService.loadUserByUsername(email));
-        } else {
-            throw new BadCredentialsException("Incorrect email or password. Authentication failed.");
-        }
+//    @GetMapping("/login")
+//    public String loginUser(@RequestPart("email") String email, @RequestPart("password") String password) throws BadCredentialsException {
+//        Authentication authentication = authenticationManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(email, password));
+//        if (authentication.isAuthenticated()) {
+//            return jwtService.generateToken(webUserService.loadUserByUsername(email));
+//        } else {
+//            throw new BadCredentialsException("Incorrect email or password. Authentication failed.");
+//        }
+//
+//    }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestParam("email") String email,
+                                       @RequestParam("password") String password) {
+        try {
+            // Authenticate user with credentials
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, password));
+
+            if (authentication.isAuthenticated()) {
+                // Generate JWT Token
+                String jwtToken = jwtService.generateToken(webUserService.loadUserByUsername(email));
+
+                // Return token in response body
+                return ResponseEntity.ok().body("Bearer " + jwtToken); // Send token as response
+
+            } else {
+                throw new BadCredentialsException("Incorrect email or password. Authentication failed.");
+            }
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials!");
+        }
     }
+
 
 
 }

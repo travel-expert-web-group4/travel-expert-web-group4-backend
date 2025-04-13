@@ -48,13 +48,19 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
         // grant authorization to users
-        httpSecurity.authorizeHttpRequests(
+        httpSecurity
+                .cors(Customizer.withDefaults()) // ✅ ENABLE CORS HERE
+                .csrf(csrf -> csrf.disable()) // ✅ THEN DISABLE CSRF
+
+
+                .authorizeHttpRequests(
                 configurer ->
                         configurer
 
                                 .requestMatchers(HttpMethod.GET, "/api/user/check-user").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/user/register-user").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/user/login").permitAll()
+//                                .requestMatchers(HttpMethod.GET, "/api/user/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/user/login").permitAll()
                                 // requests by type
 
                                 // GET
@@ -133,7 +139,7 @@ public class SecurityConfig {
         httpSecurity.httpBasic(Customizer.withDefaults());
 
         // disable csrf
-        httpSecurity.csrf(csrf -> csrf.disable());
+//        httpSecurity.csrf(csrf -> csrf.disable());
 
         // build
         return httpSecurity.build();

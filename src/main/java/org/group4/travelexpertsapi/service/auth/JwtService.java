@@ -3,13 +3,16 @@ package org.group4.travelexpertsapi.service.auth;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.group4.travelexpertsapi.entity.auth.WebUser;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import javax.xml.bind.DatatypeConverter;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,64 +20,69 @@ import java.util.Map;
 @Service
 public class JwtService {
 
-    private SecretKey secretKey;
+    @Value("${jwt.secret}")
+    private String jwtSecret;
 
-    public JwtService() {
-        this.secretKey = generateSecretKey();
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
-    // generate secret key (to sign token)
+//    public String generateToken(UserDetails userDetails) {
+//        Map<String, String> claims = new HashMap<>();
+//        claims.put("webuser", "travelexpertsapp");
+//
+//        return Jwts.builder()
+//                .claims(claims)
+//                .subject(userDetails.getUsername())
+//                .issuedAt(Date.from(Instant.now()))
+//                .expiration(Date.from(Instant.now().plusSeconds(3600))) // 1 hour
+//                .signWith(getSigningKey())
+//                .compact();
+//    }
 
-    public SecretKey generateSecretKey() {
-        SecretKey secretKey = Jwts.SIG.HS512.key().build();
-
-        // encode key to string
-        String encodedKey = DatatypeConverter.printHexBinary(secretKey.getEncoded());
-//        System.out.println("EncodedKey: " + encodedKey);
-        byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
-        return Keys.hmacShaKeyFor(decodedKey);
-
-    }
-
-    // generate token
+    @Autowired
+    private WebUserService webUserService;
 
     public String generateToken(UserDetails userDetails) {
+        // Lookup WebUser by email (username)
+        WebUser webUser = webUserService.getWebUserByEmail(userDetails.getUsername());
 
-        // using Hash-map to store claims
+        if (webUser == null || webUser.getCustomer() == null) {
+            throw new RuntimeException("User or associated customer not found.");
+        }
 
-        Map<String, String> claim = new HashMap<>();
-        claim.put("webuser", "travelexpertsapp");
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("webuser", "travelexpertsapp");
+        claims.put("sub", webUser.getEmail());  // same as userDetails.getUsername()
+        claims.put("role", "ROLE_" + webUser.getRole().toUpperCase());
+        claims.put("id", webUser.getCustomer().getId());
 
         return Jwts.builder()
-                .claims(claim)
-                .setSubject(userDetails.getUsername())
+                .claims(claims)
+                .subject(webUser.getEmail())
                 .issuedAt(Date.from(Instant.now()))
-                .expiration(Date.from(Instant.now().plusSeconds(3600))) // 1 hour
-                .signWith(secretKey)
+                .expiration(Date.from(Instant.now().plusSeconds(3600)))  // 1 hour expiry
+                .signWith(getSigningKey())
                 .compact();
-
     }
 
-    private Claims getPayload(String authToken) {
-        Claims claims = Jwts.parser()
-                .verifyWith(secretKey)
+
+    private Claims getPayload(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
                 .build()
-                .parseSignedClaims(authToken)
+                .parseSignedClaims(token.trim())
                 .getPayload();
-        return claims;
+    }
+
+    public String getUsernameFromToken(String token) {
+        return getPayload(token).getSubject();
+    }
+
+    public boolean checkIfTokenExpired(String token) {
+        return getPayload(token.trim()).getExpiration().after(new Date());
     }
 
 
-    public String getUsernameFromToken(String authToken) {
-        Claims claims = getPayload(authToken);
-        return claims.getSubject();
-    }
 
-
-
-    public boolean checkIfTokenExpired(String authToken) {
-        Claims claims = getPayload(authToken);
-        return claims.getExpiration().after(Date.from(Instant.now()));
-
-    }
 }
