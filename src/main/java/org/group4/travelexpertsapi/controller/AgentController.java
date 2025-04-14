@@ -38,7 +38,7 @@ public class AgentController {
     }
 
     @GetMapping("/email")
-    public ResponseEntity<Agent> getAgentByEmail(@RequestPart("email") String email) {
+    public ResponseEntity<Agent> getAgentByEmail(@RequestParam("email") String email) {
         Agent agent = agentService.getAgentByEmail(email);
         return agent != null ? ResponseEntity.ok(agent) : ResponseEntity.notFound().build();
     }

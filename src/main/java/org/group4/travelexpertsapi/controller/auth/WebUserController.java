@@ -15,6 +15,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
@@ -71,12 +73,17 @@ public class WebUserController {
         return webUserService.checkIfCustomerExist(email);
     }
 
-    @GetMapping("/login")
-    public String loginUser(@RequestPart("email") String email, @RequestPart("password") String password) throws BadCredentialsException {
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, String>> loginUser(
+            @RequestParam("email") String email,
+            @RequestParam("password") String password) throws BadCredentialsException {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password));
         if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(webUserService.loadUserByUsername(email));
+            String token = jwtService.generateToken(webUserService.loadUserByUsername(email));
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+            return ResponseEntity.ok(response);
         } else {
             throw new BadCredentialsException("Incorrect email or password. Authentication failed.");
         }
