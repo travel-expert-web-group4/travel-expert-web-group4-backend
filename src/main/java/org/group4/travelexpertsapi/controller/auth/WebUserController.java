@@ -119,6 +119,23 @@ public ResponseEntity<?> newUser(
 
         }
     }
+    @PostMapping("/login-agent")
+    public ResponseEntity<Map<String, String>> loginAgent(
+            @RequestParam("email") String email,
+            @RequestParam("password") String password) throws BadCredentialsException {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, password));
+        if (authentication.isAuthenticated()) {
+
+            String token = jwtService.generateAgentToken(webUserService.loadUserByUsername(email));
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+            return ResponseEntity.ok(response);
+        } else {
+            throw new BadCredentialsException("Incorrect email or password. Authentication failed.");
+
+        }
+    }
 
 
 

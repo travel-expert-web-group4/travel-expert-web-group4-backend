@@ -61,7 +61,7 @@ public class SecurityConfig {
 
                                 .requestMatchers(HttpMethod.POST, "/api/user/register-user","/api/agents/").permitAll()
 //                                .requestMatchers(HttpMethod.GET, "/api/user/login").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/user/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/user/login","/api/user/login-agent").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/booking/**").permitAll()
 
                                 // requests by type
