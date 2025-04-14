@@ -88,13 +88,16 @@ public class JwtService {
         claims.put("sub", webUser.getEmail());
         claims.put("role", "ROLE_" + webUser.getRole().toUpperCase());
 
+        // Always include WebUser ID
+        claims.put("webUserId", webUser.getId());
+
         if ("CUSTOMER".equalsIgnoreCase(webUser.getRole())) {
             if (webUser.getCustomer() == null) {
                 throw new RuntimeException("Customer data missing for this user.");
             }
 
             // ✅ Customer-specific claims
-            claims.put("id", webUser.getCustomer().getId());
+            claims.put("customerId", webUser.getCustomer().getId()); // distinguishable
             claims.put("points", webUser.getPoints());
 
             if (webUser.getCustomerType() != null) {
@@ -102,9 +105,7 @@ public class JwtService {
             }
 
         } else if ("AGENT".equalsIgnoreCase(webUser.getRole())) {
-            claims.put("id", webUser.getId());
-
-            // ✅ Import your custom User entity here (not Spring's User)
+            // ✅ Agent-specific info
             org.group4.travelexpertsapi.entity.User agentUser =
                     userRepo.findByEmail(webUser.getEmail()).orElse(null);
 

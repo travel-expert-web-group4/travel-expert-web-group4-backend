@@ -4,8 +4,10 @@ import org.group4.travelexpertsapi.entity.Customer;
 
 import org.group4.travelexpertsapi.entity.CustomerType;
 
+import org.group4.travelexpertsapi.repository.CustomerRepo;
 import org.group4.travelexpertsapi.service.CustomerService;
 import org.group4.travelexpertsapi.service.auth.WebUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/api/customer")
@@ -32,7 +35,7 @@ public class CustomerController {
     }
 
 
-  
+
     @GetMapping
     public List<Customer> getCustomerList() {
         return customerService.getAllCustomers();
@@ -127,6 +130,20 @@ public class CustomerController {
     public ResponseEntity<Customer> deleteImage(@PathVariable("customer_id") Integer customer_id) {
         webUserService.deletePicture(customer_id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Autowired
+    private CustomerRepo customerRepo;
+
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<Customer> getCustomerByEmail(@PathVariable String email) {
+        Customer customer = customerRepo.findByCustemail(email);
+        if (customer != null) {
+            return ResponseEntity.ok(customer);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 
