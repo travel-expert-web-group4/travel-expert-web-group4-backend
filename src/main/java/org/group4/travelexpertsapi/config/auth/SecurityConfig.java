@@ -99,6 +99,7 @@ public class SecurityConfig {
                                 // only Customers
                                 .requestMatchers(HttpMethod.POST,
                                         "/api/booking/new/**",
+                                        "/api/booking/*/paid",
                                         "/api/customer/new/**",
                                         "/api/customer/*/profile-picture",
                                         "/api/review/post",
