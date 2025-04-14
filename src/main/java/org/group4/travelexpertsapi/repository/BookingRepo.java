@@ -16,4 +16,6 @@ public interface BookingRepo extends JpaRepository<Booking, Integer> {
     Booking findByBookingno(String bookingno);
 
     Booking findByCustomerid_CustemailAndPackageid_PkgnameOrderBySavedAtDesc(String customeridCustemail, String packageidPkgname);
+
+    boolean existsByBookingno(String bookingno);
 }

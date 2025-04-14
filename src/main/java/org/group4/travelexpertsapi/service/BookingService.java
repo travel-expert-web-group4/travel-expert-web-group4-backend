@@ -29,6 +29,10 @@ public class BookingService {
         this.bookingdetailRepo = bookingdetailRepo;
     }
 
+    public List<Booking> getAllBookings() {
+        return bookingRepo.findAll();
+    }
+
     public Optional<BookingDTO> getBookingByBookingNo(String bookingNo) {
         Booking booking = bookingRepo.findByBookingno(bookingNo);
         if (booking != null) {
@@ -56,7 +60,7 @@ public class BookingService {
         Package bookingPackage = packageRepo.findById(packageId).orElse(null);
         Triptype triptype = triptypeRepo.findByTriptypeid(tripTypeId);
         if (customer != null && bookingPackage != null && triptype != null) {
-            dto.setBookingNo(generateBookingNumber());
+            dto.setBookingNo(uniqueBookingNumber());
             Booking booking = convertToBooking(dto, customer, bookingPackage, triptype);
             bookingRepo.save(booking);
             Bookingdetail details = convertToBookingdetail(dto);
@@ -147,6 +151,16 @@ public class BookingService {
         details.setAgencycommission(dto.getAgencyCommission());
         details.setBookingid(booking);
         return details;
+    }
+
+    public String uniqueBookingNumber() {
+        String bookingNumber = "";
+
+        do {
+            bookingNumber = generateBookingNumber();
+        } while (bookingRepo.existsByBookingno(bookingNumber));
+
+        return bookingNumber;
     }
 
     public String generateBookingNumber() {
