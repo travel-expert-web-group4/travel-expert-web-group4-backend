@@ -54,7 +54,7 @@ public class SecurityConfig {
 
                                 .requestMatchers(HttpMethod.GET, "/api/user/check-user").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/user/register-user","/api/agents/").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/user/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/user/login").permitAll()
                                 // requests by type
 
                                 // GET
@@ -70,7 +70,8 @@ public class SecurityConfig {
                                         "/api/review/package**",
                                         "/api/review/**",
                                         "/api/product/**",
-                                        "/api/supplier/**"
+                                        "/api/supplier/**",
+                                        "/images/**"
                                 ).permitAll()
 
                                 // both Customers and agents
