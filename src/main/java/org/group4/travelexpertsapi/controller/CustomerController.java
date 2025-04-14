@@ -4,8 +4,10 @@ import org.group4.travelexpertsapi.entity.Customer;
 
 import org.group4.travelexpertsapi.entity.CustomerType;
 
+import org.group4.travelexpertsapi.repository.CustomerRepo;
 import org.group4.travelexpertsapi.service.CustomerService;
 import org.group4.travelexpertsapi.service.auth.WebUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/api/customer")
@@ -31,7 +35,7 @@ public class CustomerController {
     }
 
 
-  
+
     @GetMapping
     public List<Customer> getCustomerList() {
         return customerService.getAllCustomers();
@@ -93,11 +97,29 @@ public class CustomerController {
 
     // Add Profile Picture
 
+//    @PostMapping(value = "/{customer_id}/profile-picture", consumes = "multipart/form-data")
+//    public ResponseEntity<Customer> uploadImage(@PathVariable("customer_id") Integer customer_id, @RequestPart("image") MultipartFile image) {
+//        webUserService.savePicture(customer_id, image);
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
+
     @PostMapping(value = "/{customer_id}/profile-picture", consumes = "multipart/form-data")
-    public ResponseEntity<Customer> uploadImage(@PathVariable("customer_id") Integer customer_id, @RequestPart("image") MultipartFile image) {
-        webUserService.savePicture(customer_id, image);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<Map<String, String>> uploadImage(
+            @PathVariable("customer_id") Integer customer_id,
+            @RequestPart("image") MultipartFile image) {
+        try {
+            String savedPath = webUserService.savePicture(customer_id, image); // <- this method should return the saved image path or URL
+
+            // ✅ Return JSON with the image path
+            return ResponseEntity.ok(Map.of("profileImage", savedPath));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to upload image"));
+        }
     }
+
+
 
     // Update Profile Picture
 
@@ -113,6 +135,20 @@ public class CustomerController {
     public ResponseEntity<Customer> deleteImage(@PathVariable("customer_id") Integer customer_id) {
         webUserService.deletePicture(customer_id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Autowired
+    private CustomerRepo customerRepo;
+
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<Customer> getCustomerByEmail(@PathVariable String email) {
+        Customer customer = customerRepo.findByCustemail(email);
+        if (customer != null) {
+            return ResponseEntity.ok(customer);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 

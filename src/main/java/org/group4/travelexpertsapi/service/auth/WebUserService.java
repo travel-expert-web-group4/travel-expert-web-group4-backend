@@ -42,44 +42,98 @@ public class WebUserService implements UserDetailsService {
     private String imageUploadDir;
 
     // create new web user
-    public void createNewUser(String email, String password, String agentEmail, String agentPassword) {
-        WebUser webUser=new WebUser(email, password);
-        webUser.setPoints((0));
-        Customer customer = customerRepo.findByCustemail(email);
+//    public void createNewUser(String email, String password, String agentEmail, String agentPassword) {
+//        WebUser webUser=new WebUser(email, password);
+//        webUser.setPoints((0));
+//        Customer customer = customerRepo.findByCustemail(email);
+//
+//        if (customer != null) {
+//            webUser.setCustomer(customer);
+//            Double points =  getPointsBalance(customer.getId());
+//            customerTypeSetter(webUser, points);
+//            webUser.setPoints(points.intValue());
+//        }
+//
+//        webUser.setRole("CUSTOMER");
+//
+//        // check if agent
+//        webUser.setAgent(false);
+//
+//
+//        if (agentEmail != null) {
+//
+////            Agent agent = agentRepo.findByAgtemail(agentEmail);
+//            org.group4.travelexpertsapi.entity.User agent = userRepo.findByEmail(agentEmail).orElse(null);
+//            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+//
+//            if (agent != null){
+//                Boolean matches = encoder.matches(agentPassword, agent.getPasswordHash());
+//                if (matches) {
+//                    webUser.setAgent(true);
+//                }
+//
+//            }
+//        }
+//
+//        // CHANGE TO HASHED PASSWORD WHEN SECURITY LAYER ADDED
+//        webUser.setPassword(password);
+//
+//        webUserRepo.save(webUser);
+//    }
 
-        if (customer != null) {
-            webUser.setCustomer(customer);
-            Double points =  getPointsBalance(customer.getId());
-            customerTypeSetter(webUser, points);
-            webUser.setPoints(points.intValue());
+public void createNewUser(String email, String password, String agentEmail, String agentPassword, String role) {
+    WebUser webUser = new WebUser(email, password);
+    webUser.setPoints(0); // initialize default points
+
+    if ("CUSTOMER".equalsIgnoreCase(role)) {
+        Customer customer = customerRepo.findByCustemail(email);
+        if (customer == null) {
+            throw new RuntimeException("Customer not found for email: " + email);
         }
 
-        webUser.setRole("CUSTOMER");
+        if (webUserRepo.findByCustomer(customer) != null) {
+            throw new RuntimeException("This customer is already registered.");
+        }
 
-        // check if agent
+        webUser.setCustomer(customer);
+        webUser.setRole("CUSTOMER");
         webUser.setAgent(false);
 
+        Double points = getPointsBalance(customer.getId());
+        if (points == null) points = 0.0;
+        customerTypeSetter(webUser, points);
+        webUser.setPoints(points.intValue());
 
-        if (agentEmail != null) {
-
-//            Agent agent = agentRepo.findByAgtemail(agentEmail);
-            org.group4.travelexpertsapi.entity.User agent = userRepo.findByEmail(agentEmail).orElse(null);
-            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-
-            if (agent != null){
-                Boolean matches = encoder.matches(agentPassword, agent.getPasswordHash());
-                if (matches) {
-                    webUser.setAgent(true);
-                }
-
-            }
+    } else if ("AGENT".equalsIgnoreCase(role)) {
+        if (agentEmail == null || agentPassword == null) {
+            throw new RuntimeException("Agent email and password are required.");
         }
 
-        // CHANGE TO HASHED PASSWORD WHEN SECURITY LAYER ADDED
-        webUser.setPassword(password);
+        org.group4.travelexpertsapi.entity.User agent = userRepo.findByEmail(agentEmail).orElse(null);
 
-        webUserRepo.save(webUser);
+        if (agent == null) {
+            throw new RuntimeException("Agent not found.");
+        }
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        boolean matches = encoder.matches(agentPassword, agent.getPasswordHash());
+
+        if (!matches) {
+            throw new RuntimeException("Agent password is incorrect.");
+        }
+
+        // ✅ Agent confirmed — create as AGENT user
+        webUser.setRole("AGENT");
+        webUser.setAgent(true);
+
+        // Optional: You could link to agent object if you want, or track it differently.
+    } else {
+        throw new RuntimeException("Invalid role provided. Must be CUSTOMER or AGENT.");
     }
+
+    webUserRepo.save(webUser);
+}
+
 
     public void customerTypeSetter(WebUser webUser, double points) {
 
@@ -102,9 +156,17 @@ public class WebUserService implements UserDetailsService {
 
     // find web-user by email
     public WebUser getWebUserByEmail(String email) {
-        Customer customer = customerRepo.findByCustemail(email);
-        WebUser webUser = webUserRepo.findByCustomer(customer);
-        return webUser;
+//        Customer customer = customerRepo.findByCustemail(email);
+//        WebUser webUser = webUserRepo.findByCustomer(customer);
+//        return webUser;
+        Optional<WebUser> webUser = webUserRepo.findByEmail(email);
+        return webUser.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+
+    }
+
+    public WebUser getByEmail(String email) {
+        return webUserRepo.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 
     // find web-user by id
@@ -148,13 +210,23 @@ public class WebUserService implements UserDetailsService {
 
     // save Profile Picture
 
-    public void savePicture(Integer customerid, MultipartFile image) {
+//    public void savePicture(Integer customerid, MultipartFile image) {
+//        Customer customer = customerRepo.findById(customerid).orElse(null);
+//        WebUser webUser = webUserRepo.findByCustomer(customer);
+//        String ImageUrl = uploadPicture(customerid, image);
+//        webUser.setProfileImage(ImageUrl);
+//        webUserRepo.save(webUser);
+//    }
+
+    public String savePicture(Integer customerid, MultipartFile image) {
         Customer customer = customerRepo.findById(customerid).orElse(null);
         WebUser webUser = webUserRepo.findByCustomer(customer);
-        String ImageUrl = uploadPicture(customerid, image);
-        webUser.setProfileImage(ImageUrl);
+        String imageUrl = uploadPicture(customerid, image);
+        webUser.setProfileImage(imageUrl);
         webUserRepo.save(webUser);
+        return imageUrl;
     }
+
 
 
 
@@ -253,4 +325,7 @@ public class WebUserService implements UserDetailsService {
 //            return new String[] {"CUSTOMER"};
 //        return webUser.getRole().split(",");
 //    }
+
+
+
 }

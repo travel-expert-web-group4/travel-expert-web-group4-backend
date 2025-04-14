@@ -48,13 +48,22 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
         // grant authorization to users
-        httpSecurity.authorizeHttpRequests(
+        httpSecurity
+                .cors(Customizer.withDefaults()) // ✅ ENABLE CORS HERE
+                .csrf(csrf -> csrf.disable()) // ✅ THEN DISABLE CSRF
+
+
+                .authorizeHttpRequests(
                 configurer ->
                         configurer
 
                                 .requestMatchers(HttpMethod.GET, "/api/user/check-user").permitAll()
+
                                 .requestMatchers(HttpMethod.POST, "/api/user/register-user","/api/agents/").permitAll()
+//                                .requestMatchers(HttpMethod.GET, "/api/user/login").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/user/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/booking/**").permitAll()
+
                                 // requests by type
 
                                 // GET
@@ -98,8 +107,11 @@ public class SecurityConfig {
 
                                 // only Customers
                                 .requestMatchers(HttpMethod.POST,
-                                        "/api/booking/new/**",
+
+                                       // "/api/booking/new/**",
+
                                         "/api/booking/*/paid",
+
                                         "/api/customer/new/**",
                                         "/api/customer/*/profile-picture",
                                         "/api/review/post",
@@ -158,7 +170,7 @@ public class SecurityConfig {
         httpSecurity.httpBasic(Customizer.withDefaults());
 
         // disable csrf
-        httpSecurity.csrf(csrf -> csrf.disable());
+//        httpSecurity.csrf(csrf -> csrf.disable());
 
         // build
         return httpSecurity.build();
