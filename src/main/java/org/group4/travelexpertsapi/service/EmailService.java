@@ -34,20 +34,20 @@ public class EmailService {
         this.bookingService = bookingService;
     }
 
-    @Scheduled(fixedRate = 21600000)
-    @Transactional
-    public void checkReminder() {
-        // Check all bookings for unpaid bookings
-        List<Booking> bookings = bookingService.getAllBookings();
-        for (Booking booking : bookings) {
-            if (booking.getBookingdate() == null && booking.getSavedAt().isAfter(Instant.now().minus(24, ChronoUnit.HOURS))) {
-                emailReminder(booking.getCustomerid().getCustemail(), booking);
-            } else if (booking.getBookingdate() == null && booking.getSavedAt().isBefore(Instant.now().minus(24, ChronoUnit.HOURS))) {
-                emailExpiry(booking.getCustomerid().getCustemail(), booking);
-                bookingService.deleteBooking(booking.getBookingno());
-            }
-        }
-    }
+//    @Scheduled(fixedRate = 21600000)
+//    @Transactional
+//    public void checkReminder() {
+//        // Check all bookings for unpaid bookings
+//        List<Booking> bookings = bookingService.getAllBookings();
+//        for (Booking booking : bookings) {
+//            if (booking.getBookingdate() == null && booking.getSavedAt().isAfter(Instant.now().minus(24, ChronoUnit.HOURS))) {
+//                emailReminder(booking.getCustomerid().getCustemail(), booking);
+//            } else if (booking.getBookingdate() == null && booking.getSavedAt().isBefore(Instant.now().minus(24, ChronoUnit.HOURS))) {
+//                emailExpiry(booking.getCustomerid().getCustemail(), booking);
+//                bookingService.deleteBooking(booking.getBookingno());
+//            }
+//        }
+//    }
 
     public void emailInvoice(byte[] paymentPDF, String email) {
         Email from = new Email(sender);
