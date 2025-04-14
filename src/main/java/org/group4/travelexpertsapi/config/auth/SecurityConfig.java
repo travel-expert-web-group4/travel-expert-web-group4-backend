@@ -61,6 +61,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/api/user/register-user").permitAll()
 //                                .requestMatchers(HttpMethod.GET, "/api/user/login").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/user/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/booking/**").permitAll()
                                 // requests by type
 
                                 // GET
@@ -73,7 +74,7 @@ public class SecurityConfig {
                                         "/api/agents/**",
                                         "/api/package",
                                         "/api/package/**",
-                                        "/api/review/package**",
+                                        "/api/review/package/**",
                                         "/api/review/**",
                                         "/api/product/**",
                                         "/api/supplier/**"
@@ -96,7 +97,7 @@ public class SecurityConfig {
 
                                 // only Customers
                                 .requestMatchers(HttpMethod.POST,
-                                        "/api/booking/new/**",
+                                       // "/api/booking/new/**",
                                         "/api/customer/new/**",
                                         "/api/customer/*/profile-picture",
                                         "/api/review/post",
