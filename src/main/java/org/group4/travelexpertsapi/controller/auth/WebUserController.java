@@ -15,6 +15,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
@@ -101,38 +103,20 @@ public ResponseEntity<?> newUser(
         return webUserService.checkIfCustomerExist(email);
     }
 
-//    @GetMapping("/login")
-//    public String loginUser(@RequestPart("email") String email, @RequestPart("password") String password) throws BadCredentialsException {
-//        Authentication authentication = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(email, password));
-//        if (authentication.isAuthenticated()) {
-//            return jwtService.generateToken(webUserService.loadUserByUsername(email));
-//        } else {
-//            throw new BadCredentialsException("Incorrect email or password. Authentication failed.");
-//        }
-//
-//    }
-
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestParam("email") String email,
-                                       @RequestParam("password") String password) {
-        try {
-            // Authenticate user with credentials
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(email, password));
+    public ResponseEntity<Map<String, String>> loginUser(
+            @RequestParam("email") String email,
+            @RequestParam("password") String password) throws BadCredentialsException {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, password));
+        if (authentication.isAuthenticated()) {
+            String token = jwtService.generateToken(webUserService.loadUserByUsername(email));
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+            return ResponseEntity.ok(response);
+        } else {
+            throw new BadCredentialsException("Incorrect email or password. Authentication failed.");
 
-            if (authentication.isAuthenticated()) {
-                // Generate JWT Token
-                String jwtToken = jwtService.generateToken(webUserService.loadUserByUsername(email));
-
-                // Return token in response body
-                return ResponseEntity.ok().body("Bearer " + jwtToken); // Send token as response
-
-            } else {
-                throw new BadCredentialsException("Incorrect email or password. Authentication failed.");
-            }
-        } catch (BadCredentialsException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials!");
         }
     }
 

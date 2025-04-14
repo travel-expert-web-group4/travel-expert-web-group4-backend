@@ -58,10 +58,12 @@ public class SecurityConfig {
                         configurer
 
                                 .requestMatchers(HttpMethod.GET, "/api/user/check-user").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/user/register-user").permitAll()
+
+                                .requestMatchers(HttpMethod.POST, "/api/user/register-user","/api/agents/").permitAll()
 //                                .requestMatchers(HttpMethod.GET, "/api/user/login").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/user/login").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/booking/**").permitAll()
+
                                 // requests by type
 
                                 // GET
@@ -77,10 +79,11 @@ public class SecurityConfig {
                                         "/api/review/package/**",
                                         "/api/review/**",
                                         "/api/product/**",
-                                        "/api/supplier/**"
+                                        "/api/supplier/**",
+                                        "/images/**"
                                 ).permitAll()
 
-                                // only Customers
+                                // both Customers and agents
                                 .requestMatchers(HttpMethod.GET,
                                         "/api/booking/customer/**",
                                         "/api/booking/**",
@@ -91,13 +94,24 @@ public class SecurityConfig {
                                         "/api/payment-success",
                                         "/api/stripe/payment-cancel"
 
-                                ).hasRole("CUSTOMER")
+                                ).hasAnyRole("CUSTOMER", "AGENT")
+
+                                // only Customers
+                                .requestMatchers(HttpMethod.GET,
+                                        "/api/payment-success",
+                                        "/api/stripe/payment-cancel"
+
+                                ).hasAnyRole("CUSTOMER", "AGENT")
 
                                 // POST
 
                                 // only Customers
                                 .requestMatchers(HttpMethod.POST,
+
                                        // "/api/booking/new/**",
+
+                                        "/api/booking/*/paid",
+
                                         "/api/customer/new/**",
                                         "/api/customer/*/profile-picture",
                                         "/api/review/post",
@@ -111,7 +125,7 @@ public class SecurityConfig {
                                         "/api/booking/**",
                                         "/api/customer/**"
 
-                                ).hasRole("CUSTOMER")
+                                ).hasAnyRole("CUSTOMER", "AGENT")
 
                                 // DELETE
 
@@ -125,6 +139,22 @@ public class SecurityConfig {
 
                                 // CHAT ??? TK
 //                                .requestMatchers("/chat.private").hasRole("CUSTOMER")
+
+
+
+
+                                // PUT
+
+                                // only Customers
+                                .requestMatchers(HttpMethod.PUT,
+                                        "/api/agents/**",
+                                        "/api/package/**",
+                                        "/api/product/**",
+                                        "/api/supplier/**"
+
+
+                                ).hasRole("AGENT")
+
 
                                 // AGENTS ACCESS API
 //

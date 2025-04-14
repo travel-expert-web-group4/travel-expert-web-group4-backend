@@ -42,6 +42,11 @@ public class CustomerController {
     }
     // Get customer by ID
 
+    @GetMapping("/by-agent/{id}")
+    public List<Customer> getCustomersByAgent(@PathVariable Integer id) {
+        return customerService.getCustomersAssignedToAgent(id);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Customer> getCustomer(@PathVariable Integer id) {
         Optional<Customer> customer = customerService.getCustomerById(id);
