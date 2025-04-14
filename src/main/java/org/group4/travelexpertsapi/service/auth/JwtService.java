@@ -127,7 +127,22 @@ public class JwtService {
                 .signWith(getSigningKey())
                 .compact();
     }
+    public String generateAgentToken(UserDetails userDetails) {
 
+        // using Hash-map to store claims
+
+        Map<String, String> claim = new HashMap<>();
+        claim.put("webuser", "travelexpertsapp");
+
+        return Jwts.builder()
+                .claims(claim)
+                .setSubject(userDetails.getUsername())
+                .issuedAt(Date.from(Instant.now()))
+                .expiration(Date.from(Instant.now().plusSeconds(3600))) // 1 hour
+                .signWith(getSigningKey())
+                .compact();
+
+    }
 
 
     private Claims getPayload(String token) {
