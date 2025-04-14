@@ -67,7 +67,7 @@ public class SecurityConfig {
                                         "/api/agents/**",
                                         "/api/package",
                                         "/api/package/**",
-                                        "/api/review/package**",
+                                        "/api/review/package/**",
                                         "/api/review/**",
                                         "/api/product/**",
                                         "/api/supplier/**",
