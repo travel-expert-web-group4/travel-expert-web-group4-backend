@@ -99,7 +99,7 @@ public ResponseEntity<?> newUser(
     }
 
     @GetMapping("/check-user")
-    public boolean checkUser(@RequestPart("email") String email) {
+    public boolean checkUser(@RequestParam("email") String email) {
         return webUserService.checkIfCustomerExist(email);
     }
 
