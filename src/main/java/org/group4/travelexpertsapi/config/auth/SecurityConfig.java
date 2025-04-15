@@ -93,7 +93,9 @@ public class SecurityConfig {
                                         "/api/review/**",
                                         "/api/product/**",
                                         "/api/supplier/**",
-                                        "/images/**"
+                                        "/images/**",
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**"
                                 ).permitAll()
 
                                 // both Customers and agents
