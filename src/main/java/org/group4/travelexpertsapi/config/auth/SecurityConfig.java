@@ -1,6 +1,10 @@
 package org.group4.travelexpertsapi.config.auth;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.group4.travelexpertsapi.service.auth.WebUserService;
+import org.group4.travelexpertsapi.utils.WebSocketHandshakeInterceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,18 +50,26 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        final Logger logger = LoggerFactory.getLogger(WebSocketHandshakeInterceptor.class);
+
 
         // grant authorization to users
         httpSecurity
                 .cors(Customizer.withDefaults()) // ✅ ENABLE CORS HERE
                 .csrf(csrf -> csrf.disable()) // ✅ THEN DISABLE CSRF
-
+                .exceptionHandling(handler -> handler
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            logger.warn("🚫 Unauthorized request to: {}", request.getRequestURI());
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                        })
+                )
 
                 .authorizeHttpRequests(
                 configurer ->
                         configurer
 
                                 .requestMatchers(HttpMethod.GET, "/api/user/check-user").permitAll()
+                                .requestMatchers("/chat/**").permitAll()
 
                                 .requestMatchers(HttpMethod.POST, "/api/user/register-user","/api/agents/").permitAll()
 //                                .requestMatchers(HttpMethod.GET, "/api/user/login").permitAll()

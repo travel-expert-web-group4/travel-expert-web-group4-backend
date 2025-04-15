@@ -1,5 +1,6 @@
 package org.group4.travelexpertsapi.config;
 
+import org.group4.travelexpertsapi.utils.WebSocketHandshakeInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -13,6 +14,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/chat") // WebSocket endpoint
+                .addInterceptors(new WebSocketHandshakeInterceptor())
                 .setAllowedOriginPatterns("*")
                 .withSockJS(); // Optional fallback for browsers
     }
