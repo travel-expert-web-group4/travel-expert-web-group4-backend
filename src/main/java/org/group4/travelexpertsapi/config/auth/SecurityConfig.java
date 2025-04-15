@@ -117,7 +117,7 @@ public class SecurityConfig {
                                         "/api/customer/*/profile-picture",
                                         "/api/review/post",
                                         "/api/stripe/checkout"
-                                ).hasRole("CUSTOMER")
+                                ).hasAnyRole("CUSTOMER", "AGENT")
 
                                 // PUT
 
@@ -134,7 +134,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.DELETE,
                                         "/api/booking/**",
                                         "/api/customer/**"
-                                ).hasRole("CUSTOMER")
+//                                ).hasRole("CUSTOMER")
+                                ).hasAnyRole("CUSTOMER", "AGENT")
 
 
 
