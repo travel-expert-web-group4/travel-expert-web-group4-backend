@@ -81,56 +81,109 @@ public class WebUserService implements UserDetailsService {
 //        webUserRepo.save(webUser);
 //    }
 
+//public void createNewUser(String email, String password, String agentEmail, String agentPassword, String role) {
+//    WebUser webUser = new WebUser(email, password);
+//    webUser.setPoints(0); // initialize default points
+//
+//    if ("CUSTOMER".equalsIgnoreCase(role)) {
+//        Customer customer = customerRepo.findByCustemail(email);
+//        if (customer == null) {
+//            throw new RuntimeException("Customer not found for email: " + email);
+//        }
+//
+//        if (webUserRepo.findByCustomer(customer) != null) {
+//            throw new RuntimeException("This customer is already registered.");
+//        }
+//
+//        webUser.setCustomer(customer);
+//        webUser.setRole("CUSTOMER");
+//        webUser.setAgent(false);
+//
+//        Double points = getPointsBalance(customer.getId());
+//        if (points == null) points = 0.0;
+//        customerTypeSetter(webUser, points);
+//        webUser.setPoints(points.intValue());
+//
+//    } else if ("AGENT".equalsIgnoreCase(role)) {
+//        if (agentEmail == null || agentPassword == null) {
+//            throw new RuntimeException("Agent email and password are required.");
+//        }
+//
+//        org.group4.travelexpertsapi.entity.User agent = userRepo.findByEmail(agentEmail).orElse(null);
+//
+//        if (agent == null) {
+//            throw new RuntimeException("Agent not found.");
+//        }
+//
+//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+//        boolean matches = encoder.matches(agentPassword, agent.getPasswordHash());
+//
+//        if (!matches) {
+//            throw new RuntimeException("Agent password is incorrect.");
+//        }
+//
+//        // ✅ Agent confirmed — create as AGENT user
+//        webUser.setRole("AGENT");
+//        webUser.setAgent(true);
+//
+//        // Optional: You could link to agent object if you want, or track it differently.
+//    } else {
+//        throw new RuntimeException("Invalid role provided. Must be CUSTOMER or AGENT.");
+//    }
+//
+//    webUserRepo.save(webUser);
+//}
 public void createNewUser(String email, String password, String agentEmail, String agentPassword, String role) {
     WebUser webUser = new WebUser(email, password);
     webUser.setPoints(0); // initialize default points
 
+    // 🔍 Get customer record for either role
+    Customer customer = customerRepo.findByCustemail(email);
+    if (customer == null) {
+        throw new RuntimeException("Customer not found for email: " + email);
+    }
+
+    // ❌ Prevent duplicate WebUser for same customer
+    if (webUserRepo.findByCustomer(customer) != null) {
+        throw new RuntimeException("This customer is already registered.");
+    }
+
+    // ✅ Always link customer
+    webUser.setCustomer(customer);
+
+    // Role-specific logic
     if ("CUSTOMER".equalsIgnoreCase(role)) {
-        Customer customer = customerRepo.findByCustemail(email);
-        if (customer == null) {
-            throw new RuntimeException("Customer not found for email: " + email);
-        }
-
-        if (webUserRepo.findByCustomer(customer) != null) {
-            throw new RuntimeException("This customer is already registered.");
-        }
-
-        webUser.setCustomer(customer);
         webUser.setRole("CUSTOMER");
         webUser.setAgent(false);
-
-        Double points = getPointsBalance(customer.getId());
-        if (points == null) points = 0.0;
-        customerTypeSetter(webUser, points);
-        webUser.setPoints(points.intValue());
-
     } else if ("AGENT".equalsIgnoreCase(role)) {
         if (agentEmail == null || agentPassword == null) {
             throw new RuntimeException("Agent email and password are required.");
         }
 
         org.group4.travelexpertsapi.entity.User agent = userRepo.findByEmail(agentEmail).orElse(null);
-
         if (agent == null) {
             throw new RuntimeException("Agent not found.");
         }
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         boolean matches = encoder.matches(agentPassword, agent.getPasswordHash());
-
         if (!matches) {
             throw new RuntimeException("Agent password is incorrect.");
         }
 
-        // ✅ Agent confirmed — create as AGENT user
         webUser.setRole("AGENT");
         webUser.setAgent(true);
-
-        // Optional: You could link to agent object if you want, or track it differently.
     } else {
         throw new RuntimeException("Invalid role provided. Must be CUSTOMER or AGENT.");
     }
 
+    // 🪙 Points & Customer Type
+    Double points = getPointsBalance(customer.getId());
+    if (points == null) points = 0.0;
+    customerTypeSetter(webUser, points);
+    webUser.setPoints(points.intValue());
+
+    // 💾 Save WebUser
     webUserRepo.save(webUser);
 }
 
