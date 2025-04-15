@@ -225,6 +225,14 @@ public class BookingService {
         Triptype triptype = triptypeRepo.findByTriptypeid(tripTypeId);
         if (customer != null && bookingPackage != null && triptype != null) {
             dto.setBookingNo(uniqueBookingNumber());
+
+
+            // ✅ Set savedAt here if not already set
+            if (dto.getSavedAt() == null) {
+                dto.setSavedAt(ZonedDateTime.now(ZoneId.of("America/Edmonton")).toInstant());
+            }
+
+
             Booking booking = convertToBooking(dto, customer, bookingPackage, triptype);
             bookingRepo.save(booking);
             Bookingdetail details = convertToBookingdetail(dto);
