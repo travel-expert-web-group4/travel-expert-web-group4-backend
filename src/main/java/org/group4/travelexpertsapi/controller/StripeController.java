@@ -21,8 +21,7 @@ public class StripeController {
     private final EmailService emailService;
     private final BookingService bookingService;
 
-
-    public StripeController(StripeService stripeService, PDFService pdfService, EmailService emailService,   BookingService bookingService ) {
+    public StripeController(StripeService stripeService, PDFService pdfService, EmailService emailService, BookingService bookingService) {
         this.stripeService = stripeService;
         this.pdfService = pdfService;
         this.emailService = emailService;
@@ -38,17 +37,8 @@ public class StripeController {
     @GetMapping("/payment-success")
     public RedirectView success(@RequestParam("session_id") String sessionId) {
         Session session = stripeService.getSession(sessionId);
-
-        // ✅ Get bookingNo from metadata
-        String bookingNo = session.getMetadata().get("bookingNo");
-
-        // ✅ Set booking date and savedAt
-        if (bookingNo != null) {
-            bookingService.setBookingDate(bookingNo);
-        }
-
-
-
+        // Update booking record in database
+        bookingService.setBookingDate(session.getMetadata().get("bookingNo"));
         // Generate PDF with payment information
         byte[] paymentPDF = pdfService.generatePaymentPDF(session);
         // Email the PDF

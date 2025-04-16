@@ -32,8 +32,7 @@ public class PDFService {
 
     public byte[] generatePaymentPDF(Session session) {
         // Load the corresponding booking to pull additional details
-        Booking booking = bookingRepo.findByCustomerid_CustemailAndPackageid_PkgnameOrderBySavedAtDesc(
-                session.getCustomerDetails().getEmail(), session.getLineItems().getData().getFirst().getDescription());
+        Booking booking = bookingRepo.findByBookingno(session.getMetadata().get("bookingNo"));
 
         try (PDDocument document = new PDDocument()) {
             // Load Travel Experts logo

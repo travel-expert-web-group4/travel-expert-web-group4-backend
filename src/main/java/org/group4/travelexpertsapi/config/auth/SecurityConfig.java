@@ -76,6 +76,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/api/user/login","/api/user/login-agent").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/booking/**").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/customer/new/**").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/api/stripe/payment-success", "/api/stripe/payment-cancel").permitAll()
 
                                 // requests by type
 
@@ -93,7 +94,9 @@ public class SecurityConfig {
                                         "/api/review/**",
                                         "/api/product/**",
                                         "/api/supplier/**",
-                                        "/images/**"
+                                        "/images/**",
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**"
                                 ).permitAll()
 
                                 // both Customers and agents
@@ -103,18 +106,13 @@ public class SecurityConfig {
                                         "/api/chat/history/*/*",
                                         "/api/chat/interactions",
                                         "/api/chat/contacts",
-                                        "/api/customer/**",
-                                        "/api/payment-success",
-                                        "/api/stripe/payment-cancel"
-
+                                        "/api/customer/**"
                                 ).hasAnyRole("CUSTOMER", "AGENT")
 
                                 // only Customers
-                                .requestMatchers(HttpMethod.GET,
-                                        "/api/payment-success",
-                                        "/api/stripe/payment-cancel"
-
-                                ).hasAnyRole("CUSTOMER", "AGENT")
+//                                .requestMatchers(HttpMethod.GET,
+//
+//                                ).hasAnyRole("CUSTOMER", "AGENT")
 
                                 // POST
 
