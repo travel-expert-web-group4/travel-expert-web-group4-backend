@@ -82,36 +82,37 @@ public class JwtService {
         if (webUser == null) {
             throw new RuntimeException("WebUser not found.");
         }
+        // ✅ Add these logs here
+        System.out.println("💡 WebUser role: " + webUser.getRole());
+        System.out.println("💡 WebUser customerType: " +
+                (webUser.getCustomerType() != null ? webUser.getCustomerType().getName() : "null"));
+
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("webuser", "travelexpertsapp");
         claims.put("sub", webUser.getEmail());
         claims.put("role", "ROLE_" + webUser.getRole().toUpperCase());
-
-        // Always include WebUser ID
         claims.put("webUserId", webUser.getId());
+
+        // ✅ Always include customerType if exists
+        if (webUser.getCustomerType() != null) {
+            claims.put("customerType", webUser.getCustomerType().getName());
+        }
 
         if ("CUSTOMER".equalsIgnoreCase(webUser.getRole())) {
             if (webUser.getCustomer() == null) {
                 throw new RuntimeException("Customer data missing for this user.");
             }
 
-            // ✅ Customer-specific claims
-            claims.put("customerId", webUser.getCustomer().getId()); // distinguishable
+            claims.put("customerId", webUser.getCustomer().getId());
             claims.put("points", webUser.getPoints());
-
-            if (webUser.getCustomerType() != null) {
-                claims.put("customerType", webUser.getCustomerType().getName());
-            }
-
-        } else if ("AGENT".equalsIgnoreCase(webUser.getRole())) {
-            // ✅ Agent-specific info
+        }
+        else if ("AGENT".equalsIgnoreCase(webUser.getRole())) {
             org.group4.travelexpertsapi.entity.User agentUser =
                     userRepo.findByEmail(webUser.getEmail()).orElse(null);
 
             if (agentUser != null && agentUser.getAgentid() != null) {
                 Agent agent = agentUser.getAgentid();
-
                 claims.put("agentId", agent.getId());
                 claims.put("agentEmail", agent.getAgtemail());
                 claims.put("agentName", agent.getAgtfirstname() + " " + agent.getAgtlastname());
@@ -127,6 +128,7 @@ public class JwtService {
                 .signWith(getSigningKey())
                 .compact();
     }
+
     public String generateAgentToken(UserDetails userDetails) {
 
         // using Hash-map to store claims
