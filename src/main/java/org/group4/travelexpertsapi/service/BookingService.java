@@ -221,9 +221,9 @@ public class BookingService {
         webUser.setPoints(updatedPoints);
 
         // Assign customer type based on new point balance
-        if (updatedPoints >= 5000) {
+        if (updatedPoints >= 20000) {
             webUser.setCustomerType(customerTypeRepo.findByName("Platinum"));
-        } else if (updatedPoints >= 2500) {
+        } else if (updatedPoints >= 5000) {
             webUser.setCustomerType(customerTypeRepo.findByName("Bronze"));
         } else {
             webUser.setCustomerType(customerTypeRepo.findByName("Guest"));
