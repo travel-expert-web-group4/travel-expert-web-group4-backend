@@ -77,9 +77,7 @@ public class BookingService {
 
     public Optional<BookingDTO> updateBooking(String bookingNo, BookingDTO dto) {
         Booking existingBooking = bookingRepo.findByBookingno(bookingNo);
-        List<Bookingdetail> detailsList = bookingdetailRepo.findByBookingid(existingBooking);
-        Bookingdetail details = detailsList.isEmpty() ? null : detailsList.getFirst();
-
+        Bookingdetail details = bookingdetailRepo.findByBookingid(existingBooking);
         if (existingBooking != null && details != null) {
             existingBooking.setSavedAt(ZonedDateTime.now(ZoneId.of("America/Edmonton")).toInstant());
             existingBooking.setTravelers(dto.getTravelers());
@@ -88,8 +86,6 @@ public class BookingService {
             details.setTripstart(dto.getTripStart());
             details.setTripend(dto.getTripEnd());
             bookingdetailRepo.save(details);
-
-
 
             BookingDTO converted = convertToBookingDTO(existingBooking);
             return Optional.of(converted);
@@ -109,11 +105,9 @@ public class BookingService {
 
     public boolean deleteBooking(String bookingNo) {
         Booking existingBooking = bookingRepo.findByBookingno(bookingNo);
-        List<Bookingdetail> detailsList = bookingdetailRepo.findByBookingid(existingBooking);
-        if (existingBooking != null && !detailsList.isEmpty()) {
-            for (Bookingdetail d : detailsList) {
-                bookingdetailRepo.delete(d);
-            }
+        Bookingdetail details = bookingdetailRepo.findByBookingid(existingBooking);
+        if (existingBooking != null && details != null) {
+            bookingdetailRepo.delete(details);
             bookingRepo.delete(existingBooking);
             return true;
         }
@@ -121,23 +115,17 @@ public class BookingService {
     }
 
     public BookingDTO convertToBookingDTO(Booking booking) {
-        List<Bookingdetail> detailsList = bookingdetailRepo.findByBookingid(booking);
-        Bookingdetail details = detailsList.isEmpty() ? null : detailsList.getFirst();
-
+        Bookingdetail details = bookingdetailRepo.findByBookingid(booking);
         BookingDTO dto = new BookingDTO();
         dto.setBookingNo(booking.getBookingno());
         dto.setBookingDate(booking.getBookingdate());
         dto.setName(booking.getPackageid().getPkgname());
         dto.setDestination(booking.getPackageid().getDestination());
-
-        if (details != null) {
-            dto.setTripStart(details.getTripstart());
-            dto.setTripEnd(details.getTripend());
-            dto.setDestination(details.getDestination());
-            dto.setBasePrice(details.getBaseprice());
-            dto.setAgencyCommission(details.getAgencycommission());
-        }
-
+        dto.setTripStart(details.getTripstart());
+        dto.setTripEnd(details.getTripend());
+        dto.setDestination(details.getDestination());
+        dto.setBasePrice(details.getBaseprice());
+        dto.setAgencyCommission(details.getAgencycommission());
         dto.setTravelerCount(booking.getTravelercount());
         dto.setTripTypeId(booking.getTriptypeid().getTriptypeid());
         dto.setSavedAt(booking.getSavedAt());
