@@ -3,6 +3,7 @@ package org.group4.travelexpertsapi.controller;
 import com.stripe.model.checkout.Session;
 import org.group4.travelexpertsapi.dto.BookingDTO;
 import org.group4.travelexpertsapi.dto.PaymentResponseDTO;
+import org.group4.travelexpertsapi.service.BookingService;
 import org.group4.travelexpertsapi.service.EmailService;
 import org.group4.travelexpertsapi.service.PDFService;
 import org.group4.travelexpertsapi.service.StripeService;
@@ -18,11 +19,13 @@ public class StripeController {
     private final StripeService stripeService;
     private final PDFService pdfService;
     private final EmailService emailService;
+    private final BookingService bookingService;
 
-    public StripeController(StripeService stripeService, PDFService pdfService, EmailService emailService) {
+    public StripeController(StripeService stripeService, PDFService pdfService, EmailService emailService, BookingService bookingService) {
         this.stripeService = stripeService;
         this.pdfService = pdfService;
         this.emailService = emailService;
+        this.bookingService = bookingService;
     }
 
     @PostMapping("/checkout")
@@ -34,6 +37,8 @@ public class StripeController {
     @GetMapping("/payment-success")
     public RedirectView success(@RequestParam("session_id") String sessionId) {
         Session session = stripeService.getSession(sessionId);
+        // Update booking record in database
+        bookingService.setBookingDate(session.getMetadata().get("bookingNo"));
         // Generate PDF with payment information
         byte[] paymentPDF = pdfService.generatePaymentPDF(session);
         // Email the PDF
