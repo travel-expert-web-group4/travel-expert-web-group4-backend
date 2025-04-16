@@ -2,10 +2,7 @@ package org.group4.travelexpertsapi.service;
 
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
-import com.stripe.model.LineItem;
-import com.stripe.model.LineItemCollection;
 import com.stripe.model.checkout.Session;
-import com.stripe.net.RequestOptions;
 import com.stripe.param.checkout.SessionCreateParams;
 import com.stripe.param.checkout.SessionRetrieveParams;
 import org.group4.travelexpertsapi.dto.BookingDTO;
@@ -17,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.RoundingMode;
-import java.util.*;
 
 @Service
 public class StripeService {
@@ -25,7 +21,7 @@ public class StripeService {
     @Value("${stripe.secret-key}")
     private String secretKey;
 
-    private PackageRepo packageRepo;
+    private final PackageRepo packageRepo;
 
     public StripeService(PackageRepo packageRepo) {
         this.packageRepo = packageRepo;
@@ -56,6 +52,8 @@ public class StripeService {
         SessionCreateParams sessionParams = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .putMetadata("bookingNo", booking.getBookingNo())
+                .putMetadata("basePrice", booking.getBasePrice().toString())
+                .putMetadata("commFee", booking.getAgencyCommission().toString())
                 .setSuccessUrl("http://localhost:8080/api/stripe/payment-success?session_id={CHECKOUT_SESSION_ID}")
                 .setCancelUrl("http://localhost:8080/api/stripe/payment-cancel")
                 .addLineItem(lineItem)
