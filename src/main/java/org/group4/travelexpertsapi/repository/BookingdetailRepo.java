@@ -11,6 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface BookingdetailRepo extends JpaRepository<Bookingdetail, Integer> {
-//    Bookingdetail findByBookingid(Booking bookingid);
-    List<Bookingdetail> findByBookingid(Booking booking);
+    Bookingdetail findByBookingid(Booking booking);
+//    List<Bookingdetail> findByBookingid(Booking booking);
  }
