@@ -1,5 +1,6 @@
 package org.group4.travelexpertsapi.service;
 
+import com.stripe.model.checkout.Session;
 import org.group4.travelexpertsapi.dto.BookingDTO;
 import org.group4.travelexpertsapi.entity.*;
 import org.group4.travelexpertsapi.entity.Package;
@@ -8,6 +9,7 @@ import org.group4.travelexpertsapi.repository.*;
 import org.group4.travelexpertsapi.repository.auth.WebUserRepo;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -93,13 +95,23 @@ public class BookingService {
         return Optional.empty();
     }
 
-    public void setBookingDate(String bookingNo) {
+    public void updateSuccessRecord(Session session) {
+        String bookingNo = session.getMetadata().get("bookingNo");
+        BigDecimal base = new BigDecimal(session.getMetadata().get("basePrice"));
+        BigDecimal commission = new BigDecimal(session.getMetadata().get("commFee"));
+
         Booking booking = bookingRepo.findByBookingno(bookingNo);
-        if (booking != null) {
+        Bookingdetail details = bookingdetailRepo.findByBookingid(booking);
+        if (booking != null && details != null) {
             booking.setBookingdate(ZonedDateTime.now(ZoneId.of("America/Edmonton")).toInstant());
             booking.setSavedAt(ZonedDateTime.now(ZoneId.of("America/Edmonton")).toInstant());
             Booking saved = bookingRepo.save(booking);
-            updateWebUserPointsAndType(saved);
+            if (!base.equals(details.getBaseprice()) && !commission.equals(details.getAgencycommission())) {
+                details.setBaseprice(base);
+                details.setAgencycommission(commission);
+            }
+            Bookingdetail updated = bookingdetailRepo.save(details);
+            updateWebUserPointsAndType(saved, updated);
         }
     }
 
@@ -194,15 +206,14 @@ public class BookingService {
         return sb.toString();
     }
 
-    public void updateWebUserPointsAndType(Booking booking) {
+    public void updateWebUserPointsAndType(Booking booking, Bookingdetail details) {
         Customer customer = booking.getCustomerid();
         if (customer == null) return;
 
         WebUser webUser = webUserRepo.findByCustomer(customer);
         if (webUser == null) return;
 
-        double earned = (booking.getPackageid().getPkgbaseprice().doubleValue()
-                + booking.getPackageid().getPkgagencycommission().doubleValue())
+        double earned = (details.getBaseprice().doubleValue() + details.getAgencycommission().doubleValue())
                 * booking.getTravelercount();
 
         int updatedPoints = (webUser.getPoints() != null ? webUser.getPoints() : 0) + (int) earned;

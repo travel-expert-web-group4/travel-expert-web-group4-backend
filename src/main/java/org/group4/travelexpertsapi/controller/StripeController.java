@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.math.BigDecimal;
+
 @RestController
 @RequestMapping("/api/stripe")
 public class StripeController {
@@ -38,7 +40,7 @@ public class StripeController {
     public RedirectView success(@RequestParam("session_id") String sessionId) {
         Session session = stripeService.getSession(sessionId);
         // Update booking record in database
-        bookingService.setBookingDate(session.getMetadata().get("bookingNo"));
+        bookingService.updateSuccessRecord(session);
         // Generate PDF with payment information
         byte[] paymentPDF = pdfService.generatePaymentPDF(session);
         // Email the PDF
