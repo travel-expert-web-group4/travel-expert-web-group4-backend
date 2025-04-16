@@ -3,7 +3,9 @@ package org.group4.travelexpertsapi.service;
 import org.group4.travelexpertsapi.dto.BookingDTO;
 import org.group4.travelexpertsapi.entity.*;
 import org.group4.travelexpertsapi.entity.Package;
+import org.group4.travelexpertsapi.entity.auth.WebUser;
 import org.group4.travelexpertsapi.repository.*;
+import org.group4.travelexpertsapi.repository.auth.WebUserRepo;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
@@ -20,13 +22,17 @@ public class BookingService {
     private final PackageRepo packageRepo;
     private final TriptypeRepo triptypeRepo;
     private final BookingdetailRepo bookingdetailRepo;
+    private final WebUserRepo webUserRepo;
+    private final CustomerTypeRepo customerTypeRepo;
 
-    public BookingService(BookingRepo bookingRepo, CustomerRepo customerRepo, PackageRepo packageRepo, TriptypeRepo triptypeRepo, BookingdetailRepo bookingdetailRepo) {
+    public BookingService(BookingRepo bookingRepo, CustomerRepo customerRepo, PackageRepo packageRepo, TriptypeRepo triptypeRepo, BookingdetailRepo bookingdetailRepo, WebUserRepo webUserRepo, CustomerTypeRepo customerTypeRepo) {
         this.bookingRepo = bookingRepo;
         this.customerRepo = customerRepo;
         this.packageRepo = packageRepo;
         this.triptypeRepo = triptypeRepo;
         this.bookingdetailRepo = bookingdetailRepo;
+        this.webUserRepo = webUserRepo;
+        this.customerTypeRepo = customerTypeRepo;
     }
 
     public Optional<BookingDTO> getBookingByBookingNo(String bookingNo) {
@@ -83,6 +89,8 @@ public class BookingService {
             details.setTripend(dto.getTripEnd());
             bookingdetailRepo.save(details);
 
+
+
             BookingDTO converted = convertToBookingDTO(existingBooking);
             return Optional.of(converted);
         }
@@ -94,7 +102,8 @@ public class BookingService {
         if (booking != null) {
             booking.setBookingdate(ZonedDateTime.now(ZoneId.of("America/Edmonton")).toInstant());
             booking.setSavedAt(ZonedDateTime.now(ZoneId.of("America/Edmonton")).toInstant());
-            bookingRepo.save(booking);
+            Booking saved = bookingRepo.save(booking);
+            updateWebUserPointsAndType(saved);
         }
     }
 
@@ -195,5 +204,31 @@ public class BookingService {
             sb.append((int) (Math.random() * 10));
         }
         return sb.toString();
+    }
+
+    public void updateWebUserPointsAndType(Booking booking) {
+        Customer customer = booking.getCustomerid();
+        if (customer == null) return;
+
+        WebUser webUser = webUserRepo.findByCustomer(customer);
+        if (webUser == null) return;
+
+        double earned = (booking.getPackageid().getPkgbaseprice().doubleValue()
+                + booking.getPackageid().getPkgagencycommission().doubleValue())
+                * booking.getTravelercount();
+
+        int updatedPoints = (webUser.getPoints() != null ? webUser.getPoints() : 0) + (int) earned;
+        webUser.setPoints(updatedPoints);
+
+        // Assign customer type based on new point balance
+        if (updatedPoints >= 5000) {
+            webUser.setCustomerType(customerTypeRepo.findByName("Platinum"));
+        } else if (updatedPoints >= 2500) {
+            webUser.setCustomerType(customerTypeRepo.findByName("Bronze"));
+        } else {
+            webUser.setCustomerType(customerTypeRepo.findByName("Guest"));
+        }
+
+        webUserRepo.save(webUser);
     }
 }
